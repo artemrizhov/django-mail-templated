@@ -14,11 +14,11 @@ class EmailMessage(mail.EmailMultiAlternatives):
         super(EmailMultiAlternatives, self).__init__(*args, **kwargs)
 
     @property
-    template_name(self):
+    def template_name(self):
         return self._template_name
 
     @template_name.setter
-    template_name(self, value):
+    def template_name(self, value):
         self._template_name = value
         # Load the template.
         self.template = get_template(self._template_name)
