@@ -1,5 +1,6 @@
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode
+from django.template import Context
 from django.conf import settings
 from django.core import mail
 
@@ -44,15 +45,17 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
     def send(self, *args, **kwargs):
         """Render email with the current context and send it"""
+        # Prepare context
+        context = Context(self.context)
         # Assume the subject may be set manually.
         if self._subject is not None:
-            self.subject = self._subject.render(self.context).strip('\n\r')
+            self.subject = self._subject.render(context).strip('\n\r')
         # Same for body.
         if self._body is not None:
-            self.body = self._body.render(self.context).strip('\n\r')
+            self.body = self._body.render(context).strip('\n\r')
         # The html block is optional, and it also may be set manually.
         if self._html is not None:
-            html = self._html.render(self.context).strip('\n\r')
+            html = self._html.render(context).strip('\n\r')
             if html:
                 if not self.body:
                     # This is html only message.
