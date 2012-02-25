@@ -25,7 +25,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
     @property
     def template(self):
-        reutrn self._template
+        return self._template
 
     @template.setter
     def template(self, value):
