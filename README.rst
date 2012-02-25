@@ -12,11 +12,11 @@ it as usually.
 
 Installation
 =================
-Run:
+Run::
 
-    pip install git@github.com:artemrizhov/django-mail-templated.git
+    $ pip install git@github.com:artemrizhov/django-mail-templated.git
 
-And register the app in your settings file:
+And register the app in your settings file::
 
     INSTALLED_APPS = (
         ...
@@ -26,7 +26,7 @@ And register the app in your settings file:
 Usage
 =================
 Write a template to send a plain text message. Note that first and last \n\r
-will be removed.
+will be removed::
 
     {% block subject %}
     Hello {{ user.name }}
@@ -36,7 +36,7 @@ will be removed.
     This is a plain text message.
     {% endblock %}
 
-Or for html message:
+Or for html message::
 
     {% block subject %}
     Hello {{ user.name }}
@@ -46,7 +46,7 @@ Or for html message:
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Or for multipart message just use both blocks:
+Or for multipart message just use both blocks::
 
     {% block subject %}
     Hello {{ user.name }}
@@ -60,18 +60,18 @@ Or for multipart message just use both blocks:
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Or forget some block to set it manually later with EmailMessage class:
+Or forget some block to set it manually later with EmailMessage class::
 
     {% block body %}
     This is a plain text message.
     {% endblock %}
 
-Now you can send it:
+Now you can send it::
 
     from mail_templated import send_mail
     send_mail('email/hello.tpl', {'user': user}, from_email, [user.email])
 
-Or if you wish to add more control over message creating then user the class:
+Or if you wish to add more control over message creating then user the class::
 
     from mail_templated import EmailMessage
     message = EmailMessage('email/hello.tpl', {'user': user}, to=[user.email])
