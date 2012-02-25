@@ -1,5 +1,6 @@
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode
+from django.template import Context
 from django.conf import settings
 from django.core import mail
 
@@ -7,25 +8,30 @@ class EmailMessage(mail.EmailMultiAlternatives):
     """Extends standard EmailMessage class with ability to use templates"""
 
     def __init__(self, template_name, context, *args, **kwargs):
+        self._subject = None
+        self._body = None
+        self._html = None
         # This causes template loading.
         self.template_name = template_name
         # Save context to process on send().
         self.context = context
-        super(EmailMultiAlternatives, self).__init__(*args, **kwargs)
+        super(mail.EmailMultiAlternatives, self).__init__(*args, **kwargs)
+        # It's not set by default, but we may ommit the html content.
+        self.alternatives = []
 
     @property
-    template_name(self):
+    def template_name(self):
         return self._template_name
 
     @template_name.setter
-    template_name(self, value):
+    def template_name(self, value):
         self._template_name = value
         # Load the template.
         self.template = get_template(self._template_name)
 
     @property
     def template(self):
-        reutrn self._template
+        return self._template
 
     @template.setter
     def template(self, value):
@@ -44,15 +50,17 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
     def send(self, *args, **kwargs):
         """Render email with the current context and send it"""
+        # Prepare context
+        context = Context(self.context)
         # Assume the subject may be set manually.
         if self._subject is not None:
-            self.subject = self._subject.render(self.context).strip('\n\r')
+            self.subject = self._subject.render(context).strip('\n\r')
         # Same for body.
         if self._body is not None:
-            self.body = self._body.render(self.context).strip('\n\r')
+            self.body = self._body.render(context).strip('\n\r')
         # The html block is optional, and it also may be set manually.
         if self._html is not None:
-            html = self._html.render(self.context).strip('\n\r')
+            html = self._html.render(context).strip('\n\r')
             if html:
                 if not self.body:
                     # This is html only message.
@@ -61,7 +69,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 else:
                     # Add alternative content.
                     self.attach_alternative(html, 'text/html')
-        return super(EmailMultiAlternatives, self).send(*args, **kwargs)
+        return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
 
 
 def send_mail(template_name, context, from_email, recipient_list,
