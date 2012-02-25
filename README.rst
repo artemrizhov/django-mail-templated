@@ -14,7 +14,7 @@ Installation
 =================
 Run::
 
-    $ pip install git@github.com:artemrizhov/django-mail-templated.git
+    $ pip install -e git+git://github.com/artemrizhov/django-mail-templated.git#egg=mail_template
 
 And register the app in your settings file::
 
