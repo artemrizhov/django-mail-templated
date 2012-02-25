@@ -11,7 +11,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self.template_name = template_name
         # Save context to process on send().
         self.context = context
-        super(EmailMultiAlternatives, self).__init__(*args, **kwargs)
+        super(mail.EmailMultiAlternatives, self).__init__(*args, **kwargs)
 
     @property
     def template_name(self):
@@ -61,7 +61,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 else:
                     # Add alternative content.
                     self.attach_alternative(html, 'text/html')
-        return super(EmailMultiAlternatives, self).send(*args, **kwargs)
+        return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
 
 
 def send_mail(template_name, context, from_email, recipient_list,
