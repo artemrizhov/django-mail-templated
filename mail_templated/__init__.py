@@ -8,6 +8,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
     """Extends standard EmailMessage class with ability to use templates"""
 
     def __init__(self, template_name, context, *args, **kwargs):
+        self._subject = None
+        self._body = None
+        self._html = None
         # This causes template loading.
         self.template_name = template_name
         # Save context to process on send().
