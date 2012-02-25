@@ -16,6 +16,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # Save context to process on send().
         self.context = context
         super(mail.EmailMultiAlternatives, self).__init__(*args, **kwargs)
+        # It's not set by default, but we may ommit the html content.
+        self.alternatives = []
 
     @property
     def template_name(self):
