@@ -163,6 +163,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
     def send(self, *args, **kwargs):
         "Render email with the current context and send it"
         return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
+    
+    def __repr__(self):
+        return "EmailMessage(%s)" % self.current_values
 
 def send_mail(template_name, context, from_email, recipient_list,
               fail_silently=False, auth_user=None, auth_password=None,
