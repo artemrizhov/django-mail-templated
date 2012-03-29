@@ -1,0 +1,17 @@
+{% block subject %}
+kevin spacey
+{% endblock subject %}
+
+{% block from %}
+The Admin <admin@example.com>
+{% endblock %}
+
+{% block extra_headers %}
+X-Wrapped: wrap
+	wrap
+X-Other: whee
+{% endblock %}
+
+{% block body %}
+Hello {{ foo }}.
+{% endblock %}
