@@ -6,9 +6,9 @@ Django-Mail-Templated
 
 Overview
 =================
-This is a tiny wrapper around standard EmailMessage class and send_mail()
-function. Just pass the template_name and context as first parameters, and use
-it as usually.
+This is a tiny wrapper around the standard EmailMessage class and send_mail()
+function. Just pass template_name and context as the first parameters then use
+as normal.
 
 Installation
 =================
@@ -20,12 +20,12 @@ And register the app in your settings file::
 
     INSTALLED_APPS = (
         ...
-        mail_templated
+        'mail_templated'
     )
 
 Usage
 =================
-Write a template to send a plain text message. Note that first and last \n\r
+Write a template to send a plain text message. Note that first and last newline
 will be removed::
 
     {% block subject %}
@@ -36,7 +36,7 @@ will be removed::
     This is a plain text message.
     {% endblock %}
 
-Or for html message::
+Or for an html message::
 
     {% block subject %}
     Hello {{ user.name }}
@@ -46,7 +46,7 @@ Or for html message::
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Or for multipart message just use both blocks::
+Or for a multipart message you can use both blocks::
 
     {% block subject %}
     Hello {{ user.name }}
@@ -60,7 +60,7 @@ Or for multipart message just use both blocks::
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Or forget some block to set it manually later with EmailMessage class::
+Or leave out some block to set it manually later with EmailMessage class::
 
     {% block body %}
     This is a plain text message.
@@ -71,7 +71,7 @@ Now you can send it::
     from mail_templated import send_mail
     send_mail('email/hello.tpl', {'user': user}, from_email, [user.email])
 
-Or if you wish to add more control over message creating then user the class::
+Or if you wish to add more control over message creation then use the class form::
 
     from mail_templated import EmailMessage
     message = EmailMessage('email/hello.tpl', {'user': user}, to=[user.email])
