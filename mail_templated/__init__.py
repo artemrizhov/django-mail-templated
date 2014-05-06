@@ -71,6 +71,22 @@ class EmailMessage(mail.EmailMultiAlternatives):
                     self.attach_alternative(html, 'text/html')
         return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
 
+    def __getstate__(self):
+        """
+        Exclude BlockNode and Template objects from pickling, b/c they can't
+        be pickled.
+        """
+        return dict((k, v) for k, v in self.__dict__.iteritems()
+                    if not k in ('_body', '_html', '_subject', '_template'))
+
+    def __setstate__(self, state):
+        """
+        Use the template_name setter after unpickling so the orignal values of
+        _body, _html, _subject and _template will be restored.
+        """
+        self.__dict__ = state
+        self.template_name = self._template_name
+
 
 def send_mail(template_name, context, from_email, recipient_list,
               fail_silently=False, auth_user=None, auth_password=None,
