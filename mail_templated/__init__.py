@@ -13,8 +13,13 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._html = None
         # This causes template loading.
         self.template_name = template_name
-        # Save context to process on send().
+        # Save context for processing on send().
         self.context = context
+        # I don't call EmailMessage's __init__() here to disable ability
+        # to pass it's value via parameters. But I really don't remember why
+        # I did so. Maybe to avoid conflicts because this class works with
+        # alternatives internally. This needs further inspection and testing.
+        # Adding automated tests may help to imprve this code.
         super(mail.EmailMultiAlternatives, self).__init__(*args, **kwargs)
         # It's not set by default, but we may ommit the html content.
         self.alternatives = []
