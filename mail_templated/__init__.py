@@ -15,7 +15,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self.template_name = template_name
         # Save context to process on send().
         self.context = context
-        super(mail.EmailMultiAlternatives, self).__init__(*args, **kwargs)
+        super(EmailMessage, self).__init__(*args, **kwargs)
         # It's not set by default, but we may ommit the html content.
         self.alternatives = []
 
@@ -69,7 +69,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 else:
                     # Add alternative content.
                     self.attach_alternative(html, 'text/html')
-        return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
+        return super(EmailMessage, self).send(*args, **kwargs)
 
     def __getstate__(self):
         """
