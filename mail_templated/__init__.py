@@ -43,7 +43,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._template = value
         # Prepare template blocks to not search them each time we send
         # a message.
-        for block in self._template.nodelist:
+        for block in self._template.template.nodelist:
             # We are interested in BlockNodes only. Ignore another elements.
             if isinstance(block, BlockNode):
                 if block.name == 'subject':
