@@ -7,3 +7,5 @@ DATABASES = {
 INSTALLED_APPS = (
     'mail_templated',
 )
+
+SECRET_KEY = 'test'
