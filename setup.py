@@ -22,7 +22,7 @@ CLASSIFIERS = [
 
 setup(
     name='django-mail-templated',
-    version='0.2.1',
+    version='0.2.2',
     packages=['mail_templated'],
     author='Artem Rizhov',
     author_email='artem.rizhov@gmail.com',
@@ -32,4 +32,5 @@ setup(
     long_description=LONG_DESCRIPTION,
     platforms=['any'],
     classifiers=CLASSIFIERS,
+    test_suite='runtests.runtests',
 )
