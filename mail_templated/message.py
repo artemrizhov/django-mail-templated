@@ -71,7 +71,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 else:
                     # Add alternative content.
                     self.attach_alternative(html, 'text/html')
-        return super(mail.EmailMultiAlternatives, self).send(*args, **kwargs)
+        return super(EmailMessage, self).send(*args, **kwargs)
 
     def __getstate__(self):
         """
