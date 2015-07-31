@@ -29,10 +29,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # In Django 1.7 get_template() returned a django.template.Template.
         # In Django 1.8 it returns a django.template.backends.django.Template.
         template = get_template(self._template_name)
-        try:
-            self.template = template.template
-        except AttributeError:
-            self.template = template
+        self.template = getattr(template, 'template', template)
 
     @property
     def template(self):
