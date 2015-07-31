@@ -7,6 +7,12 @@ sys.path.insert(0, test_dir)
 
 from django.test.utils import get_runner
 from django.conf import settings
+try:
+    from django.apps import apps
+    apps.populate(settings.INSTALLED_APPS)
+except ImportError:
+    # Old Django versions do not need such initialisation.
+    pass
 
 
 def runtests():

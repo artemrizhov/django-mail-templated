@@ -13,7 +13,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._html = None
         # This causes template loading.
         self.template_name = template_name
-        # Save context to process on send().
+        # Save context for processing on send().
         self.context = context
         super(EmailMessage, self).__init__(*args, **kwargs)
 
@@ -24,8 +24,12 @@ class EmailMessage(mail.EmailMultiAlternatives):
     @template_name.setter
     def template_name(self, value):
         self._template_name = value
+
         # Load the template.
-        self.template = get_template(self._template_name)
+        # In Django 1.7 get_template() returned a django.template.Template.
+        # In Django 1.8 it returns a django.template.backends.django.Template.
+        template = get_template(self._template_name)
+        self.template = getattr(template, 'template', template)
 
     @property
     def template(self):
