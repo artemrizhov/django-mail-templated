@@ -1,5 +1,6 @@
 from django.core import mail
 from django.test import TestCase
+from django.utils import translation
 
 from . import send_mail
 
@@ -41,6 +42,18 @@ class SendMailTestCase(TestCase):
         self.assertEqual(message.alternatives[0][0],
                          'User, this is an html part.')
         self.assertEqual(message.alternatives[0][1], 'text/html')
+
+    def test_multilang(self):
+        translation.activate('en')
+        send_mail(
+            'mail_templated_test/multilang.html', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, 'Hello User')
+        self.assertEqual(message.body,
+                         'User, this is a plain text part.')
+        translation.deactivate()
 
     def test_alternatives(self):
         send_mail(

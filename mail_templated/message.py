@@ -54,6 +54,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """Render email with the current context and send it"""
         # Prepare context
         context = Context(self.context)
+        context.template = self.template
         # Assume the subject may be set manually.
         if self._subject is not None:
             self.subject = self._subject.render(context).strip('\n\r')
