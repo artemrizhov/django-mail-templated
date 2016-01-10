@@ -5,6 +5,6 @@ Hello {{ name }}
 
 {% block body %}
 {% blocktrans with user_name=name %}
-{{ user_name }}, this is a plain text part.
+{{ user_name }}, this is a plain text message.
 {% endblocktrans %}
 {% endblock %}
