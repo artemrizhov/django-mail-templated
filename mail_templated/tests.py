@@ -100,11 +100,6 @@ class EmailMessageTestCase(TestCase):
         message.send()
         self.assertEqual(len(mail.outbox), 1)
         message = mail.outbox[0]
-        self.assertEqual(message.from_email, 'from@inter.net')
-        self.assertEqual(message.to, ['to@inter.net'])
-        self.assertEqual(message.subject, 'Hello User')
-        self.assertEqual(message.body,
-                         'User, this is a plain text message.')
 
     def test_defaults(self):
         message = EmailMessage(
@@ -128,3 +123,16 @@ class EmailMessageTestCase(TestCase):
         self.assertEqual(message.subject, 'Hello User')
         self.assertEqual(message.body,
                          'User, this is a plain text message.')
+
+    def test_render(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'}, render=True)
+        self.assertEqual(message.subject, 'Hello User')
+        self.assertEqual(message.body,
+                         'User, this is a plain text message.')
+
+    def test_norender(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'})
+        self.assertEqual(message.subject, None)
+        self.assertEqual(message.body, None)

@@ -27,6 +27,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._subject = None
         self._body = None
         self._html = None
+        self._rendered = False
 
         # This causes template loading.
         self.template_name = template_name
@@ -35,8 +36,13 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
+        render = kwargs.pop('render', False)
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
+
+        # Render immediately if requested.
+        if render:
+            self.render()
 
     @property
     def template_name(self):
@@ -71,8 +77,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 if block.name == 'html':
                     self._html = block
 
-    def send(self, *args, **kwargs):
-        """Render email with the current context and send it"""
+    def render(self):
+        """Render email with the current context"""
         # Prepare context
         context = Context(self.context)
         context.template = self.template
@@ -93,7 +99,14 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 else:
                     # Add alternative content.
                     self.attach_alternative(html, 'text/html')
+        self._rendered = True
+
+    def send(self, *args, **kwargs):
+        """Render email if needed and send it"""
+        if kwargs.pop('render', False) or not self._rendered:
+            self.render()
         return super(EmailMessage, self).send(*args, **kwargs)
+
 
     def __getstate__(self):
         """
