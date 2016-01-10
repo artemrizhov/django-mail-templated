@@ -47,9 +47,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._html = None
         self._rendered = False
 
-        # This causes template loading.
-        self.template_name = template_name
-        # Save context for processing on send().
+        self.load_template(template_name)
         self.context = context
 
         subject = kwargs.pop('subject', None)
@@ -62,26 +60,23 @@ class EmailMessage(mail.EmailMultiAlternatives):
             self.render()
 
     @property
-    def template_name(self):
-        return self._template_name
-
-    @template_name.setter
-    def template_name(self, value):
-        self._template_name = value
-
-        # Load the template.
-        # In Django 1.7 get_template() returned a django.template.Template.
-        # In Django 1.8 it returns a django.template.backends.django.Template.
-        template = get_template(self._template_name)
-        self.template = getattr(template, 'template', template)
-
-    @property
     def template(self):
         return self._template
 
-    @template.setter
-    def template(self, value):
-        self._template = value
+    def load_template(self, template_name):
+        """
+        Load the template
+
+        Arguments:
+            :param template_name: A name of template with optional blocks
+                'subject', 'body' and 'html'.
+            :type template_name: str
+        """
+        # In Django 1.7 get_template() returned a django.template.Template.
+        # In Django 1.8 it returns a django.template.backends.django.Template.
+        template = get_template(template_name)
+        self._template = getattr(template, 'template', template)
+
         # Prepare template blocks to not search them each time we send
         # a message.
         for block in self._template.nodelist:
