@@ -7,7 +7,7 @@ from django.template.loader_tags import BlockNode
 class EmailMessage(mail.EmailMultiAlternatives):
     """Extends standard EmailMessage class with ability to use templates"""
 
-    def __init__(self, template_name, context, *args, **kwargs):
+    def __init__(self, template_name=None, context={}, *args, **kwargs):
         """
         Initialize single templated email message (which can be sent to
         multiple recipients).
@@ -47,7 +47,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._html = None
         self._rendered = False
 
-        self.load_template(template_name)
+        if (template_name):
+            self.load_template(template_name)
         self.context = context
 
         subject = kwargs.pop('subject', None)

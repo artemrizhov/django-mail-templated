@@ -121,3 +121,14 @@ class EmailMessageTestCase(BaseMailTestCase):
             'mail_templated_test/plain.tpl', {'name': 'User'})
         self.assertEqual(message.subject, None)
         self.assertEqual(message.body, None)
+
+    def test_late_init(self):
+        message = EmailMessage()
+        message.load_template('mail_templated_test/plain.tpl')
+        message.context = {'name': 'User'}
+        message.from_email = 'from@inter.net'
+        message.to = ['to@inter.net']
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
