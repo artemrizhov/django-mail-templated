@@ -11,7 +11,7 @@ except:
     pass
 
 CLASSIFIERS = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
@@ -22,7 +22,7 @@ CLASSIFIERS = [
 
 setup(
     name='django-mail-templated',
-    version='0.2.2',
+    version='1.0.0',
     packages=['mail_templated'],
     author='Artem Rizhov',
     author_email='artem.rizhov@gmail.com',
