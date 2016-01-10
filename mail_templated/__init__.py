@@ -20,5 +20,5 @@ def send_mail(template_name, context, from_email, recipient_list,
                                                    password=auth_password,
                                                    fail_silently=fail_silently)
     return EmailMessage(
-        template_name, context, None, None, from_email, recipient_list,
+        template_name, context, from_email, recipient_list,
         connection=connection, *args, **kwargs).send()

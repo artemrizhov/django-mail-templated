@@ -8,14 +8,35 @@ class EmailMessage(mail.EmailMultiAlternatives):
     """Extends standard EmailMessage class with ability to use templates"""
 
     def __init__(self, template_name, context, *args, **kwargs):
+        """
+        Initialize single templated email message (which can be sent to
+        multiple recipients).
+
+        The class tries to provide interface as close to the standard Django
+        classes as possible.
+        The argument list is the same as in the base class except of two first
+        parameters 'subject' and 'body' which are replaced with 'template_name'
+        and 'context'. However you still can pass subject and body as keyword
+        arguments to provide some static content if needed.
+
+        When using with a user-specific message template for mass mailing,
+        create new EmailMessage object for each user. Think about this class
+        instance like about a single paper letter (you would not reuse it,
+        right?).
+        """
         self._subject = None
         self._body = None
         self._html = None
+
         # This causes template loading.
         self.template_name = template_name
         # Save context for processing on send().
         self.context = context
-        super(EmailMessage, self).__init__(*args, **kwargs)
+
+        subject = kwargs.pop('subject', None)
+        body = kwargs.pop('body', None)
+
+        super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
     @property
     def template_name(self):
