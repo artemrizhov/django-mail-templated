@@ -1,4 +1,5 @@
 {% load i18n %}
+
 {% block subject %}
 Hello {{ name }}
 {% endblock %}
