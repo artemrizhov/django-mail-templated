@@ -12,6 +12,11 @@ class EmailMessage(mail.EmailMultiAlternatives):
         Initialize single templated email message (which can be sent to
         multiple recipients).
 
+        When using with a user-specific message template for mass mailing,
+        create new EmailMessage object for each user. Think about this class
+        instance like about a single paper letter (you would not reuse it,
+        right?).
+
         The class tries to provide interface as close to the standard Django
         classes as possible.
         The argument list is the same as in the base class except of two first
@@ -19,10 +24,23 @@ class EmailMessage(mail.EmailMultiAlternatives):
         and 'context'. However you still can pass subject and body as keyword
         arguments to provide some static content if needed.
 
-        When using with a user-specific message template for mass mailing,
-        create new EmailMessage object for each user. Think about this class
-        instance like about a single paper letter (you would not reuse it,
-        right?).
+        Arguments:
+            :param template_name: A name of template with optional blocks
+                'subject', 'body' and 'html'.
+            :type template_name: str
+            :param context: A dictionary to be used for template rendering.
+            :type context: bool
+
+        Keyword Arguments:
+            :param subject: Default message subject.
+            :type subject: str
+            :param body: Default message body.
+            :type body: str
+            :param render: If True, render template and evaluate 'subject' and
+                'body' properties immediately.
+            :type render: bool
+
+        Other arguments are passed to the base class method as is.
         """
         self._subject = None
         self._body = None
@@ -40,7 +58,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        # Render immediately if requested.
         if render:
             self.render()
 
@@ -102,7 +119,16 @@ class EmailMessage(mail.EmailMultiAlternatives):
         self._rendered = True
 
     def send(self, *args, **kwargs):
-        """Render email if needed and send it"""
+        """
+        Render email if needed and send it
+
+        Arguments:
+            :param render: If True, render template even if it is rendered
+                already.
+            :type render: bool
+
+        Other arguments are passed to the base class method.
+        """
         if kwargs.pop('render', False) or not self._rendered:
             self.render()
         return super(EmailMessage, self).send(*args, **kwargs)
