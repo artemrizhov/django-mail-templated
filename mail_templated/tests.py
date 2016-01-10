@@ -53,10 +53,6 @@ class SendMailTestCase(TestCase):
         self.assertEqual(message.subject, 'Hello User')
         self.assertEqual(message.body,
                          'User, this is a plain text part.')
-        self.assertEqual(len(message.alternatives), 1)
-        self.assertEqual(message.alternatives[0][0],
-                         'User, this is an html part.')
-        self.assertEqual(message.alternatives[0][1], 'text/html')
         translation.deactivate()
 
     def test_alternatives(self):

@@ -8,9 +8,3 @@ Hello {{ name }}
 {{ user_name }}, this is a plain text part.
 {% endblocktrans %}
 {% endblock %}
-
-{% block html %}
-{% blocktrans with user_name=name %}
-{{ user_name }}, this is an html part.
-{% endblocktrans %}
-{% endblock %}
