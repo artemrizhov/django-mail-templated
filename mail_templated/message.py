@@ -69,7 +69,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 'subject', 'body' and 'html'.
             :type template_name: str
         """
-        self._template = get_template(template_name)
+        self._template = get_template(template_name, using='mail_templated')
 
     def render(self):
         """Render email with the current context"""
