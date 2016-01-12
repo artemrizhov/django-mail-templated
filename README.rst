@@ -6,24 +6,24 @@ Django-Mail-Templated
 
 Overview
 =================
-This is a tiny wrapper around the standard EmailMessage class and send_mail()
-function. Just pass template_name and context as the first parameters then use
-as normal.
+This is a tiny wrapper around the standard ``EmailMessage`` class and
+``send_mail()`` function.
+Just pass template_name and context as the first parameters then use as normal.
 
 Features:
 
 * Built with OOP, KISS and flexibility in mind. Really small and simple, but
   yet full-featured (I hope).
 
-* Extends and mimics the built-in Django `EmailMessage` and `send_mail()`.
+* Extends and mimics the built-in Django ``EmailMessage`` and ``send_mail()``.
   Compatible as much as possible.
 
 * Fully supports Django template system including template inheritance
-  (thanks to **BradWhittington** for the note about the problem).
+  (thanks to *BradWhittington* for the note about the problem).
 
 * Supports any possible template engines and loaders.
 
-* Supports serialisation (thanks to **arjandepooter**).
+* Supports serialisation (thanks to *arjandepooter*).
 
 * Fully covered with tests.
 
@@ -48,7 +48,7 @@ And register the app in your settings file::
 Usage
 =================
 
-Each email template should extend "mail_templated/base.tpl" or it's clone
+Each email template should extend ``"mail_templated/base.tpl"`` or it's clone
 either directly or via descendants.
 This is the only way to provide robust and full support for template
 inheritance, because Django template engine takes a lot of changes from time
@@ -104,12 +104,12 @@ Partial template without subject::
     This is a plain text message.
     {% endblock %}
 
-Fast method with `send_mail()` function::
+Fast method with ``send_mail()`` function::
 
     from mail_templated import send_mail
     send_mail('email/hello.tpl', {'user': user}, from_email, [user.email])
 
-More control with `EmailMessage` class::
+More control with ``EmailMessage`` class::
 
     from mail_templated import EmailMessage
 
@@ -140,6 +140,7 @@ More control with `EmailMessage` class::
 
     message.send()
 
-Look into the source code
+Look into the source code for more info.
 
-That's all. Please create an issue at GitHub if you have any notes,
+Please create an issue at GitHub if you have any notes.
+Pull requests are welcome!
