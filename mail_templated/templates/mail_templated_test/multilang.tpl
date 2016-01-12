@@ -1,3 +1,4 @@
+{% extends "mail_templated/base.tpl" %}
 {% load i18n %}
 
 {% block subject %}

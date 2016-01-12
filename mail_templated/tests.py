@@ -79,6 +79,24 @@ class SendMailTestCase(BaseMailTestCase):
                          'User, this is an html part.')
         self.assertEqual(message.alternatives[1][1], 'text/html')
 
+    def test_extended(self):
+        self._send_mail(
+            'mail_templated_test/extended.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a base message.')
+
+    def test_overridden(self):
+        self._send_mail(
+            'mail_templated_test/overridden.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Overridden hello User',
+            'User, this is overridden message.')
+
+    def test_overridden2(self):
+        self._send_mail(
+            'mail_templated_test/overridden2.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Overridden hello User',
+            'User, this is overridden message.\nReally.')
+
 
 class EmailMessageTestCase(BaseMailTestCase):
 

@@ -1,7 +1,6 @@
 from django.core import mail
 from django.template import Context
 from django.template.loader import get_template
-from django.template.loader_tags import BlockNode
 
 
 class EmailMessage(mail.EmailMultiAlternatives):
@@ -42,9 +41,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         Other arguments are passed to the base class method as is.
         """
-        self._subject = None
-        self._body = None
-        self._html = None
         self._rendered = False
 
         if (template_name):
@@ -73,45 +69,24 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 'subject', 'body' and 'html'.
             :type template_name: str
         """
-        # In Django 1.7 get_template() returned a django.template.Template.
-        # In Django 1.8 it returns a django.template.backends.django.Template.
-        template = get_template(template_name)
-        self._template = getattr(template, 'template', template)
-
-        # Prepare template blocks to not search them each time we send
-        # a message.
-        for block in self._template.nodelist:
-            # We are interested in BlockNodes only. Ignore another elements.
-            if isinstance(block, BlockNode):
-                if block.name == 'subject':
-                    self._subject = block
-                elif block.name == 'body':
-                    self._body = block
-                if block.name == 'html':
-                    self._html = block
+        self._template = get_template(template_name)
 
     def render(self):
         """Render email with the current context"""
-        # Prepare context
-        context = Context(self.context)
-        context.template = self.template
-        # Assume the subject may be set manually.
-        if self._subject is not None:
-            self.subject = self._subject.render(context).strip('\n\r')
-        # Same for body.
-        if self._body is not None:
-            self.body = self._body.render(context).strip('\n\r')
+        result = self.template.render(Context(self.context))
+        # Don't overwrite default static value with empty one.
+        self.subject = self._get_block(result, 'subject') or self.subject
+        self.body = self._get_block(result, 'body') or self.body
         # The html block is optional, and it also may be set manually.
-        if self._html is not None:
-            html = self._html.render(context).strip('\n\r')
-            if html:
-                if not self.body:
-                    # This is html only message.
-                    self.body = html
-                    self.content_subtype = 'html'
-                else:
-                    # Add alternative content.
-                    self.attach_alternative(html, 'text/html')
+        html = self._get_block(result, 'html')
+        if html:
+            if not self.body:
+                # This is html only message.
+                self.body = html
+                self.content_subtype = 'html'
+            else:
+                # Add alternative content.
+                self.attach_alternative(html, 'text/html')
         self._rendered = True
 
     def send(self, *args, **kwargs):
@@ -128,6 +103,14 @@ class EmailMessage(mail.EmailMultiAlternatives):
         if kwargs.pop('render', False) or not self._rendered:
             self.render()
         return super(EmailMessage, self).send(*args, **kwargs)
+
+
+    def _get_block(self, content, name):
+        marks = tuple('{{#{}_{}#}}'.format(p, name) for p in ('start', 'end'))
+        start, end = (content.find(m) for m in marks)
+        if start == -1 or end == -1:
+            return
+        return content[start + len(marks[0]) : end].strip('\n\r')
 
 
     def __getstate__(self):

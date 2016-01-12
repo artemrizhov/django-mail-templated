@@ -1,9 +1,9 @@
-{% extends "mail_templated/base.tpl" %}
+{% extends "mail_templated_test/base.tpl" %}
 
 {% block subject %}
 Hello {{ name }}
 {% endblock %}
 
 {% block body %}
-{{ name }}, this is a plain text message.
+{{ name }}, this is a base message.
 {% endblock %}
