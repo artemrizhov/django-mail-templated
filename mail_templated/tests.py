@@ -161,3 +161,17 @@ class EmailMessageTestCase(BaseMailTestCase):
         self._assertMessage(
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.')
+
+    def test_alternatives(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        message.attach_alternative('HTML alternative', 'text/html')
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+        self.assertEqual(len(message.alternatives), 1)
+        self.assertEqual(message.alternatives[0][0],
+                         'HTML alternative')
+        self.assertEqual(message.alternatives[0][1], 'text/html')
