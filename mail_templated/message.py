@@ -115,7 +115,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         Exclude Template objects from pickling, b/c they can't be pickled.
         """
-        return dict((k, v) for k, v in self.__dict__.iteritems()
+        return dict((k, v) for k, v in self.__dict__.items()
                     if not k in ('template',))
 
     def __setstate__(self, state):
