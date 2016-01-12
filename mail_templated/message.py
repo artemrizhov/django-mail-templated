@@ -43,19 +43,17 @@ class EmailMessage(mail.EmailMultiAlternatives):
         Other arguments are passed to the base class method as is.
         """
         self._rendered = False
-
-        if (template_name):
-            self.load_template(template_name)
         self.context = context
-
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
         render = kwargs.pop('render', False)
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if render:
-            self.render()
+        if (template_name):
+            self.load_template(template_name)
+            if render:
+                self.render()
 
     @property
     def template(self):

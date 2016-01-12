@@ -146,6 +146,11 @@ class EmailMessageTestCase(BaseMailTestCase):
         self.assertEqual(message.subject, None)
         self.assertEqual(message.body, None)
 
+    def test_skiprender(self):
+        message = EmailMessage(render=True)
+        self.assertEqual(message.subject, None)
+        self.assertEqual(message.body, None)
+
     def test_late_init(self):
         message = EmailMessage()
         message.load_template('mail_templated_test/plain.tpl')
