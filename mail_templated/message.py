@@ -24,8 +24,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
         arguments to provide some static content if needed.
 
         Arguments:
-            :param template_name: A name of template with optional blocks
-                'subject', 'body' and 'html'.
+            :param template_name: A name of template that extends
+                `mail_templated/base.tpl` with blocks 'subject', 'body' and
+                 'html'.
             :type template_name: str
             :param context: A dictionary to be used for template rendering.
             :type context: bool
@@ -35,8 +36,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
             :type subject: str
             :param body: Default message body.
             :type body: str
-            :param render: If True, render template and evaluate 'subject' and
-                'body' properties immediately.
+            :param render: If `True`, render template and evaluate `subject`
+                and `body` properties immediately. Default is `False`.
             :type render: bool
 
         Other arguments are passed to the base class method as is.
@@ -62,7 +63,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
     def load_template(self, template_name):
         """
-        Load the template
+        Load the specified template
 
         Arguments:
             :param template_name: A name of template with optional blocks
