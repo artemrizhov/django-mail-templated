@@ -29,6 +29,8 @@ Features:
 
 * Tested with Django 1.4-1.9.
 
+* Compatible with Python 3.
+
 
 Installation
 =================
