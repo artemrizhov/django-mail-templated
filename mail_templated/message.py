@@ -42,22 +42,18 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         Other arguments are passed to the base class method as is.
         """
-        self._rendered = False
+        self.template_name = template_name
         self.context = context
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
         render = kwargs.pop('render', False)
+        self.template = None
+        self._rendered = False
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if (template_name):
-            self.load_template(template_name)
-            if render:
-                self.render()
-
-    @property
-    def template(self):
-        return self._template
+        if render and template_name:
+            self.render()
 
     def load_template(self, template_name):
         """
@@ -68,10 +64,13 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 'subject', 'body' and 'html'.
             :type template_name: str
         """
-        self._template = get_template(template_name)
+        self.template = get_template(template_name)
 
     def render(self):
         """Render email with the current context"""
+        # Load template if it is not loaded yet.
+        if not self.template:
+            self.load_template(self.template_name)
         result = self.template.render(Context(self.context))
         # Don't overwrite default static value with empty one.
         self.subject = self._get_block(result, 'subject') or self.subject
@@ -114,16 +113,14 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
     def __getstate__(self):
         """
-        Exclude BlockNode and Template objects from pickling, b/c they can't
-        be pickled.
+        Exclude Template objects from pickling, b/c they can't be pickled.
         """
         return dict((k, v) for k, v in self.__dict__.iteritems()
-                    if not k in ('_body', '_html', '_subject', '_template'))
+                    if not k in ('template',))
 
     def __setstate__(self, state):
         """
-        Use the template_name setter after unpickling so the orignal values of
-        _body, _html, _subject and _template will be restored.
+        Reinitialise the `template` property. It will be loaded if needed.
         """
         self.__dict__ = state
-        self.template_name = self._template_name
+        self.template = None

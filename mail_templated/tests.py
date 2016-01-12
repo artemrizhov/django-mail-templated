@@ -1,3 +1,5 @@
+import pickle
+
 from django.core import mail
 from django.test import TestCase
 from django.utils import translation
@@ -175,3 +177,27 @@ class EmailMessageTestCase(BaseMailTestCase):
         self.assertEqual(message.alternatives[0][0],
                          'HTML alternative')
         self.assertEqual(message.alternatives[0][1], 'text/html')
+
+    def test_pickling(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        self.assertEqual(message.template, None)
+        dumped_message = pickle.dumps(message)
+        message = pickle.loads(dumped_message)
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+
+    def test_pickling_rendered(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], render=True)
+        self.assertNotEqual(message.template, None)
+        dumped_message = pickle.dumps(message)
+        message = pickle.loads(dumped_message)
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
