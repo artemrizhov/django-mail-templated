@@ -162,7 +162,7 @@ class EmailMessageTestCase(BaseMailTestCase):
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.')
 
-    def test_alternatives(self):
+    def test_attach_alternative(self):
         message = EmailMessage(
             'mail_templated_test/plain.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'])
