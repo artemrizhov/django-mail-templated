@@ -37,7 +37,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
             :param body: Default message body.
             :type body: str
             :param render: If `True`, render template and evaluate `subject`
-                and `body` properties immediately. Default is `False`.
+                and `body` properties immediately. Default is `False`. Ignored
+                if `template_name` is None.
             :type render: bool
 
         Other arguments are passed to the base class method as is.
@@ -93,7 +94,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         Arguments:
             :param render: If True, render template even if it is rendered
-                already.
+                already. Default is `False`.
             :type render: bool
 
         Other arguments are passed to the base class method.
