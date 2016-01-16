@@ -1,6 +1,7 @@
 import pickle
 
 from django.core import mail
+from django.template import TemplateDoesNotExist
 from django.test import TestCase
 from django.utils import translation
 
@@ -148,10 +149,8 @@ class EmailMessageTestCase(BaseMailTestCase):
         self.assertEqual(message.subject, None)
         self.assertEqual(message.body, None)
 
-    def test_skiprender(self):
-        message = EmailMessage(render=True)
-        self.assertEqual(message.subject, None)
-        self.assertEqual(message.body, None)
+    def test_cantrender(self):
+        self.assertRaises(TemplateDoesNotExist, EmailMessage, render=True)
 
     def test_late_init(self):
         message = EmailMessage()

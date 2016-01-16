@@ -37,8 +37,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
             :param body: Default message body.
             :type body: str
             :param render: If `True`, render template and evaluate `subject`
-                and `body` properties immediately. Default is `False`. Ignored
-                if `template_name` is None.
+                and `body` properties immediately. Default is `False`.
             :type render: bool
 
         Other arguments are passed to the base class method as is.
@@ -53,7 +52,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if render and template_name:
+        if render:
             self.render()
 
     def load_template(self, template_name):
