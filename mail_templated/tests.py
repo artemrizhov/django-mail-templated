@@ -8,6 +8,11 @@ from django.utils import translation
 from . import send_mail, EmailMessage
 
 
+CONTEXT2 = {'name': 'User2'}
+SUBJECT2 = 'Hello User2'
+BODY2 = 'User2, this is a plain text message.'
+
+
 class BaseMailTestCase(TestCase):
 
     def _assertMessage(self, from_email, to, subject, body):
@@ -136,22 +141,6 @@ class EmailMessageTestCase(BaseMailTestCase):
             'User, this is a plain text message.',
             subject='Static subject', body='Static body')
 
-    def test_render(self):
-        message = EmailMessage(
-            'mail_templated_test/plain.tpl', {'name': 'User'}, render=True)
-        self.assertEqual(message.subject, 'Hello User')
-        self.assertEqual(message.body,
-                         'User, this is a plain text message.')
-
-    def test_norender(self):
-        message = EmailMessage(
-            'mail_templated_test/plain.tpl', {'name': 'User'})
-        self.assertEqual(message.subject, None)
-        self.assertEqual(message.body, None)
-
-    def test_cantrender(self):
-        self.assertRaises(TemplateDoesNotExist, EmailMessage, render=True)
-
     def test_late_init(self):
         message = EmailMessage()
         message.load_template('mail_templated_test/plain.tpl')
@@ -200,3 +189,96 @@ class EmailMessageTestCase(BaseMailTestCase):
         self._assertMessage(
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.')
+
+
+class RenderTestCase(BaseMailTestCase):
+
+    def _initMessage(self, *args, **kwargs):
+        return EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            *args, **kwargs)
+
+    def _assertIsRendered(self, message, is_rendered, subject='Hello User',
+                          body='User, this is a plain text message.'):
+        if is_rendered:
+            self.assertEqual(message.subject, subject)
+            self.assertEqual(message.body, body)
+            self.assertTrue(message.is_rendered)
+        else:
+            self.assertEqual(message.subject, None)
+            self.assertEqual(message.body, None)
+            self.assertFalse(message.is_rendered)
+
+    def test_init_render(self):
+        message = self._initMessage(render=True)
+        self._assertIsRendered(message, True)
+        message.send()
+        self._assertIsRendered(message, True)
+
+    def test_init_norender(self):
+        message = self._initMessage()
+        self._assertIsRendered(message, False)
+        message.send()
+        self._assertIsRendered(message, True)
+
+    def test_init_notrender(self):
+        message = self._initMessage(render=False)
+        self._assertIsRendered(message, False)
+
+    def test_init_cantrender(self):
+        self.assertRaises(TemplateDoesNotExist, EmailMessage, render=True)
+
+    def test_manual_render(self):
+        message = self._initMessage()
+        message.render()
+        self._assertIsRendered(message, True)
+        message.context = CONTEXT2
+        message.render()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+        message.send()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+
+    def test_manual_rerender(self):
+        message = self._initMessage(render=True)
+        message.context = CONTEXT2
+        message.render()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+        message.send()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+
+    def test_manual_cantrender(self):
+        message = EmailMessage()
+        self.assertRaises(TemplateDoesNotExist, message.render)
+
+    def test_send_norender(self):
+        message = self._initMessage()
+        message.send()
+        self._assertIsRendered(message, True)
+
+    def test_send_notrender(self):
+        message = self._initMessage()
+        message.send(render=False)
+        self._assertIsRendered(message, True)
+
+    def test_send_render(self):
+        message = self._initMessage()
+        message.send(render=True)
+        self._assertIsRendered(message, True)
+
+    def test_send_norerender(self):
+        message = self._initMessage(render=True)
+        message.context = CONTEXT2
+        message.send()
+        self._assertIsRendered(message, True)
+
+    def test_send_notrerender(self):
+        message = self._initMessage(render=True)
+        message.context = CONTEXT2
+        message.send(render=False)
+        self._assertIsRendered(message, True)
+
+    def test_send_rerender(self):
+        message = self._initMessage(render=True)
+        message.context = CONTEXT2
+        message.send(render=True)
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
