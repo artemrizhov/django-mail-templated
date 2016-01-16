@@ -113,31 +113,65 @@ More control with ``EmailMessage`` class::
 
     from mail_templated import EmailMessage
 
-    # Render immediately on initialisation.
+    # Create new empty message.
+    message = EmailMessage()
+
+    # Initialize message on creation.
+    message = EmailMessage('email/hello.tpl', {'user': user}, from_email,
+                           to=[user.email])
+
+    # Set default subject and body.
+    message = EmailMessage(subject=subject, body=body)
+
+    # Initialize message and render template immediately.
     message = EmailMessage('email/hello.tpl', {'user': user}, from_email,
                            to=[user.email], render=True)
-    send_to_queue(message)  # The message may be serialised safely.
 
-    # Initialize and render later.
-    message = EmailMessage(to=[user.email])
-    message.load_template('email/hello.tpl')
+    # Initialize message later.
+    message.subject = 'Default subject'
     message.context = {'user': user}
-    message.render()
+    message.template_name = 'email/hello.tpl'
     message.from_email = from_email
     message.to = [user.email]
 
-    # Attach alternatives, files, etc.
+    # Attach alternatives, files, etc., as if you'd use standard
+    # EmailMultiAlternatives object.
     message.attach_alternative('HTML alternative', 'text/html')
 
-    # Set default subject and body
-    message = EmailMessage('email/hello.tpl', {'user': user},
-                           subject=subject, body=body)
+    # Serialize message after initialization if needed.
+    save_message_to_db(pickle.dumps(message))
+    # Then restore when ready to continue.
+    message = pickle.loads(get_message_from_db())
 
-    # Change subject or body manually at any time.
+    # Force immediate template load if you want to handle this somehow.
+    try:
+        message.load_template('email/hello.tpl')
+    except TemplateDoesNotExist:
+        message.load_template('email/default.tpl')
+
+    # You can also set template object manually.
+    message.template = get_template('mail_templated_test/plain.tpl')
+
+    # Force template rendering. If template is not loaded on this stage then
+    # it will be loaded automatically, so you actually don't have to call
+    # `load_template()` manually.
+    message.render()
+
+    # Get compiled subject and body as if you'd use standard Django message
+    # object.
+    logger.debug('Sending message with subject "{}" and body "{}"'.format(
+        message.subject, message.body))
+
+    # Change subject and body manually at any time. But remember they can be
+    # overwritten by template rendering if not rendered yet.
     message.subject = subject
     message.body = body
 
+    # This is also good point for serialization. Subject and body will be also
+    # serialized, the template system will not be used after deserialization.
+    message = pickle.loads(pickle.dumps(message))
 
+    # Send message when ready. It will be rendered automatically if needed.
     message.send()
 
 Look into the source code for more info.
