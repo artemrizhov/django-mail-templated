@@ -95,14 +95,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         Render email if needed and send it
 
-        Arguments:
-            :param render: If True, render template even if it is rendered
-                already. Default is `False`.
-            :type render: bool
-
-        Other arguments are passed to the base class method.
+        All arguments are passed to the base class method.
         """
-        if kwargs.pop('render', False) or not self._is_rendered:
+        if not self._is_rendered:
             self.render()
         return super(EmailMessage, self).send(*args, **kwargs)
 

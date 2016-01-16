@@ -250,35 +250,14 @@ class RenderTestCase(BaseMailTestCase):
         message = EmailMessage()
         self.assertRaises(TemplateDoesNotExist, message.render)
 
-    def test_send_norender(self):
+    def test_send_notrendered(self):
         message = self._initMessage()
-        message.send()
-        self._assertIsRendered(message, True)
-
-    def test_send_notrender(self):
-        message = self._initMessage()
-        message.send(render=False)
-        self._assertIsRendered(message, True)
-
-    def test_send_render(self):
-        message = self._initMessage()
-        message.send(render=True)
-        self._assertIsRendered(message, True)
-
-    def test_send_norerender(self):
-        message = self._initMessage(render=True)
         message.context = CONTEXT2
         message.send()
-        self._assertIsRendered(message, True)
-
-    def test_send_notrerender(self):
-        message = self._initMessage(render=True)
-        message.context = CONTEXT2
-        message.send(render=False)
-        self._assertIsRendered(message, True)
-
-    def test_send_rerender(self):
-        message = self._initMessage(render=True)
-        message.context = CONTEXT2
-        message.send(render=True)
         self._assertIsRendered(message, True, SUBJECT2, BODY2)
+
+    def test_send_rendered(self):
+        message = self._initMessage(render=True)
+        message.context = CONTEXT2
+        message.send()
+        self._assertIsRendered(message, True)
