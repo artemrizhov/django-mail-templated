@@ -48,12 +48,16 @@ class EmailMessage(mail.EmailMultiAlternatives):
         body = kwargs.pop('body', None)
         render = kwargs.pop('render', False)
         self.template = None
-        self._rendered = False
+        self._is_rendered = False
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
         if render:
             self.render()
+
+    @property
+    def is_rendered(self):
+        return self._is_rendered
 
     def load_template(self, template_name):
         """
@@ -85,7 +89,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
             else:
                 # Add alternative content.
                 self.attach_alternative(html, 'text/html')
-        self._rendered = True
+        self._is_rendered = True
 
     def send(self, *args, **kwargs):
         """
@@ -98,7 +102,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         Other arguments are passed to the base class method.
         """
-        if kwargs.pop('render', False) or not self._rendered:
+        if kwargs.pop('render', False) or not self._is_rendered:
             self.render()
         return super(EmailMessage, self).send(*args, **kwargs)
 
