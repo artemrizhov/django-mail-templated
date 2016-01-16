@@ -2,6 +2,7 @@ import pickle
 
 from django.core import mail
 from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.test import TestCase
 from django.utils import translation
 
@@ -143,10 +144,28 @@ class EmailMessageTestCase(BaseMailTestCase):
 
     def test_late_init(self):
         message = EmailMessage()
-        message.load_template('mail_templated_test/plain.tpl')
+        message.template_name = 'mail_templated_test/plain.tpl'
         message.context = {'name': 'User'}
         message.from_email = 'from@inter.net'
         message.to = ['to@inter.net']
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+
+    def test_load_template(self):
+        message = EmailMessage(None, {'name': 'User'}, 'from@inter.net',
+                               ['to@inter.net'])
+        message.load_template('mail_templated_test/plain.tpl')
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+
+    def test_manual_load_template(self):
+        message = EmailMessage(None, {'name': 'User'}, 'from@inter.net',
+                               ['to@inter.net'])
+        message.template = get_template('mail_templated_test/plain.tpl')
         message.send()
         self._assertMessage(
             'from@inter.net', ['to@inter.net'], 'Hello User',
