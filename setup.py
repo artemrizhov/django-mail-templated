@@ -6,7 +6,7 @@ DESCRIPTION = 'Send emails with Django template system'
 
 LONG_DESCRIPTION = None
 try:
-    LONG_DESCRIPTION = open('README.rst').read()
+    LONG_DESCRIPTION = open('README.md').read()
 except:
     pass
 
@@ -23,7 +23,8 @@ CLASSIFIERS = [
 setup(
     name='django-mail-templated',
     version='2.3.0',
-    packages=['mail_templated'],
+    packages=['mail_templated', 'mail_templated.tests'],
+    include_package_data=True,
     author='Artem Rizhov',
     author_email='artem.rizhov@gmail.com',
     url='https://github.com/artemrizhov/django-mail-templated',
