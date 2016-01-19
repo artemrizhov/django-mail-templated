@@ -1,0 +1,18 @@
+{% extends "mail_templated/base.tpl" %}
+
+{% block subject %}
+Django {{ django_version }} and Python {{ python_version }}
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block html %}
+
+  <ul>
+        {% for db in not_in_db %}
+            <li>{{ db }}</li>
+        {% endfor %}
+   </ul>
+
+{% endblock %}
