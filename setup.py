@@ -22,7 +22,7 @@ CLASSIFIERS = [
 
 setup(
     name='django-mail-templated',
-    version='2.3.0',
+    version='2.4.0',
     packages=['mail_templated', 'mail_templated.tests'],
     include_package_data=True,
     author='Artem Rizhov',

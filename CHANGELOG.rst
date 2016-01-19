@@ -1,6 +1,13 @@
 Django-Mail-Templated Changelog
 ===============================
 
+2.4.0
+-----
+
+- Fixed setup.py, added missing files to the package.
+
+- Added more tests.
+
 2.3.0
 -----
 
