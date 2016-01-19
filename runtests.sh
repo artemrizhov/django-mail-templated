@@ -16,9 +16,10 @@ function test {
 
     # Setup virtual environment for the specified Django version if absent.
     IFS='.' read v1 v2 <<< "$v"
-    env="../env/$pv-$v"
     if $install ; then
-        env="../env/install-$pv-$v"
+        env="env/install-$pv-$v"
+    else
+        env="env/$pv-$v"
     fi
     if [ ! -d $env ] ; then
         virtualenv --no-site-packages -p /usr/bin/python$pv $env
@@ -29,14 +30,17 @@ function test {
     pip install -U "django>=$v1.$v2,<$v1.$(($v2+1))"
     if $install ; then
         pip install -U "django-mail-templated"
-        project_dir="../testproject"
+        project_dir="testproject"
         mkdir $project_dir
-        django-admin startproject testproject $project_dir
-        sed -i -- 's/\(INSTALLED_APPS\s*=\s*\[\)/\1"mail_templated",/' $project_dir/testproject/settings.py
+        $env/bin/django-admin.py startproject testproject $project_dir
+        sed -i -- "s/\(INSTALLED_APPS\s*=\s*[\[(]\)/\1'mail_templated',/" $project_dir/testproject/settings.py
+        sed -i -- "s/\('django.db.backends.\)'/\1sqlite3'/" $project_dir/testproject/settings.py
+        sed -i -- "s/\('NAME': '\)'/\1db.sqlite3'/" $project_dir/testproject/settings.py
         $project_dir/manage.py test mail_templated
-#        rm -r $project_dir
+        rm -r $project_dir
     else
-        $env/bin/python$pv runtests.py
+        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        $env/bin/python$pv $DIR/runtests.py
     fi
 
     deactivate
