@@ -88,6 +88,14 @@ class SendMailTestCase(BaseMailTestCase):
                          'User, this is an html part.')
         self.assertEqual(message.alternatives[1][1], 'text/html')
 
+    def test_attachment(self):
+        message = self._send_mail(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.',
+            attachments=[('tests.py', __file__, 'text/plain')])
+        self.assertEqual(len(message.attachments), 1)
+
     def test_extended(self):
         self._send_mail(
             'mail_templated_test/extended.tpl', {'name': 'User'},
@@ -208,6 +216,20 @@ class EmailMessageTestCase(BaseMailTestCase):
         self._assertMessage(
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.')
+
+    def test_attach(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        message.attach_file(__file__)
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+        self.assertEqual(len(message.attachments), 1)
+        self.assertEqual(message.attachments[0][0], 'tests.py')
+        self.assertTrue(len(message.attachments[0][1]) > 0)
+        self.assertTrue(message.attachments[0][2].startswith('text'))
 
 
 class RenderTestCase(BaseMailTestCase):
