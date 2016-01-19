@@ -1,3 +1,4 @@
+import os
 import pickle
 
 from django.core import mail
@@ -6,7 +7,7 @@ from django.template.loader import get_template
 from django.test import TestCase
 from django.utils import translation
 
-from . import send_mail, EmailMessage
+from .. import send_mail, EmailMessage
 
 
 CONTEXT2 = {'name': 'User2'}
@@ -89,12 +90,17 @@ class SendMailTestCase(BaseMailTestCase):
         self.assertEqual(message.alternatives[1][1], 'text/html')
 
     def test_attachment(self):
+        file_name = os.path.join(os.path.dirname(__file__), 'attachment.png')
+        with open(file_name, 'rb') as f:
+            content = f.read()
+        attachment = ('attachment.png', content, 'image/png')
         message = self._send_mail(
             'mail_templated_test/plain.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.',
-            attachments=[('tests.py', __file__, 'text/plain')])
+            attachments=[attachment])
         self.assertEqual(len(message.attachments), 1)
+        self.assertEqual(message.attachments[0], attachment)
 
     def test_extended(self):
         self._send_mail(
@@ -221,15 +227,18 @@ class EmailMessageTestCase(BaseMailTestCase):
         message = EmailMessage(
             'mail_templated_test/plain.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'])
-        message.attach_file(__file__)
+        # Attach binary file because of strange encoding issue with textual
+        # attachments on Django 1.6-1.8 and Python 3.
+        file_name = os.path.join(os.path.dirname(__file__), 'attachment.png')
+        message.attach_file(file_name, 'image/png')
         message.send()
         self._assertMessage(
             'from@inter.net', ['to@inter.net'], 'Hello User',
             'User, this is a plain text message.')
         self.assertEqual(len(message.attachments), 1)
-        self.assertEqual(message.attachments[0][0], 'tests.py')
+        self.assertEqual(message.attachments[0][0], 'attachment.png')
         self.assertTrue(len(message.attachments[0][1]) > 0)
-        self.assertTrue(message.attachments[0][2].startswith('text'))
+        self.assertEqual(message.attachments[0][2], 'image/png')
 
 
 class RenderTestCase(BaseMailTestCase):
