@@ -6,7 +6,7 @@ DESCRIPTION = 'Send emails with Django template system'
 
 LONG_DESCRIPTION = None
 try:
-    LONG_DESCRIPTION = open('README.md').read()
+    LONG_DESCRIPTION = open('README.rst').read()
 except:
     pass
 
