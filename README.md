@@ -9,8 +9,11 @@ Overview
 --------
 
 This is a tiny wrapper around the standard `EmailMessage` class and
-`send_mail()` function. Just pass `template_name` and `context` as the
-first parameters then use as normal.
+`send_mail()` function that provides an easy way to create email messages
+using the [Django template system]
+(https://docs.djangoproject.com/es/1.9/topics/templates/).
+Just pass `template_name` and `context` as the first parameters then use as
+normal.
 
 Features:
 
@@ -189,3 +192,12 @@ Look into the source code for more info.
 
 Please create an issue at GitHub if you have any notes. Pull requests
 are welcome!
+
+Useful links
+------------
+- [Django template language]
+  (https://docs.djangoproject.com/es/1.9/ref/templates/language/)
+- [Built-in template tags and filters]
+  (https://docs.djangoproject.com/es/1.9/ref/templates/builtins/)
+- [The basics of Django template system]
+  (https://docs.djangoproject.com/es/1.9/topics/templates/)
