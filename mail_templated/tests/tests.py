@@ -240,6 +240,30 @@ class EmailMessageTestCase(BaseMailTestCase):
         self.assertTrue(len(message.attachments[0][1]) > 0)
         self.assertEqual(message.attachments[0][2], 'image/png')
 
+    from django.test.utils import override_settings
+    # @override_settings(
+    #         EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend')
+    @override_settings(
+            EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend')
+    def test_bug_15(self):
+        import sys
+        import django
+        from django.conf import settings
+        recipient_list = ['test@inter.net']
+        not_in_db = [1, 2, 3]
+        context = {
+            'python_version': '.'.join(str(s) for s in sys.version_info[:3]),
+            'django_version': '.'.join(str(s) for s in django.VERSION[:3]),
+            'not_in_db': list(not_in_db)
+        }
+        message = EmailMessage(
+            template_name='mail_templated_test/daily_digest.email',
+            context=context,
+            from_email=settings.DEFAULT_FROM_EMAIL, to=recipient_list)
+        file_name = os.path.join(os.path.dirname(__file__), 'digest.xls')
+        message.attach_file(file_name)
+        message.send()
+
 
 class RenderTestCase(BaseMailTestCase):
 
