@@ -250,7 +250,7 @@ class EmailMessageTestCase(BaseMailTestCase):
         import django
         from django.conf import settings
         recipient_list = ['test@inter.net']
-        not_in_db = [1, 2, 3]
+        not_in_db = [u'1', u'2', u'3']
         context = {
             'python_version': '.'.join(str(s) for s in sys.version_info[:3]),
             'django_version': '.'.join(str(s) for s in django.VERSION[:3]),
