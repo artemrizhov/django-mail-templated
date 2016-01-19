@@ -1,3 +1,6 @@
+"""
+Setup Django environment for tests or for Python shell.
+"""
 import os
 import sys
 

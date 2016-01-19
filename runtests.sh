@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Run tests with all supported Django and Python versions.
+# If --install is passed, also test installation from PyPI.
 
 set -e
 

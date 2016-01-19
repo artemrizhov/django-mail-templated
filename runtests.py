@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+"""
+Run tests without Django project.
+"""
 import sys
 from django.conf import settings
 from test_init import init_django  # Initialize Django.

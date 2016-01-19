@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-DESCRIPTION = 'Send emails with Django template system'
+DESCRIPTION = 'Send emails using Django template system'
 
 LONG_DESCRIPTION = None
 try:

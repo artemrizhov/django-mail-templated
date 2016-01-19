@@ -2,8 +2,7 @@
 Django-Mail-Templated
 ==============================
 
-:Info: Send emails using Django template system
-:Author: Artem Rizhov (https://github.com/artemrizhov)
+**Send emails using Django template system**
 
 Overview
 =================
@@ -15,7 +14,7 @@ using the `Django template system
 Just pass ``template_name`` and ``context`` as the first parameters then use as
 normal.
 
-Features:
+**Features:**
 
 * Built with OOP, KISS and flexibility in mind. Really small and simple, but
   yet full-featured (I hope).
@@ -66,7 +65,7 @@ to time.
 
 Note that first and last newlines inside of block contents will be removed.
 
-Plain text message:
+**Plain text message:**
 
 .. code-block:: html+django
 
@@ -80,7 +79,7 @@ Plain text message:
     This is a plain text message.
     {% endblock %}
 
-HTML message:
+**HTML message:**
 
 .. code-block:: html+django
 
@@ -94,7 +93,7 @@ HTML message:
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Multipart message:
+**Multipart message:**
 
 .. code-block:: html+django
 
@@ -112,7 +111,7 @@ Multipart message:
     This is an <strong>html</strong> message.
     {% endblock %}
 
-Partial template without subject:
+**Partial template without subject:**
 
 .. code-block:: html+django
 
@@ -122,14 +121,14 @@ Partial template without subject:
     This is a plain text message.
     {% endblock %}
 
-Fast method with ``send_mail()`` function:
+**Fast method using ``send_mail()`` function:**
 
 .. code-block:: python
 
     from mail_templated import send_mail
     send_mail('email/hello.tpl', {'user': user}, from_email, [user.email])
 
-More control with ``EmailMessage`` class:
+**More control with ``EmailMessage`` class:**
 
 .. code-block:: python
 
@@ -196,10 +195,13 @@ More control with ``EmailMessage`` class:
     # Send message when ready. It will be rendered automatically if needed.
     message.send()
 
-Look into the source code for more info.
+Look into the `source code
+<https://github.com/artemrizhov/django-mail-templated>`_
+for more info.
 
-Please create an issue at GitHub if you have any notes.
-Pull requests are welcome!
+Please `create a GitHub issue
+<https://github.com/artemrizhov/django-mail-templated/issues/new>`_
+if you have any notes. Pull requests are welcome!
 
 Useful links
 =================
