@@ -2,6 +2,8 @@
 
 set -e
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if [[ $1 == '--install' ]] ; then
   install=true
 else
@@ -17,9 +19,9 @@ function test {
     # Setup virtual environment for the specified Django version if absent.
     IFS='.' read v1 v2 <<< "$v"
     if $install ; then
-        env="env/install-$pv-$v"
+        env="$DIR/../env/install-$pv-$v"
     else
-        env="env/$pv-$v"
+        env="$DIR/../env/$pv-$v"
     fi
     if [ ! -d $env ] ; then
         virtualenv --no-site-packages -p /usr/bin/python$pv $env
@@ -30,7 +32,7 @@ function test {
     pip install -U "django>=$v1.$v2,<$v1.$(($v2+1))"
     if $install ; then
         pip install -U "django-mail-templated"
-        project_dir="testproject"
+        project_dir="$DIR/../testproject"
         mkdir $project_dir
         $env/bin/django-admin.py startproject testproject $project_dir
         sed -i -- "s/\(INSTALLED_APPS\s*=\s*[\[(]\)/\1'mail_templated',/" $project_dir/testproject/settings.py
@@ -39,7 +41,6 @@ function test {
         $project_dir/manage.py test mail_templated
         rm -r $project_dir
     else
-        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         $env/bin/python$pv $DIR/runtests.py
     fi
 
@@ -47,9 +48,14 @@ function test {
     echo ""
 }
 
+current_dir=`pwd`
+cd $DIR/..
+
 for v in "1.4" "1.5" "1.6" "1.7" "1.8" "1.9" ; do
     test $v 2
     if [[ ! ( $v =~ ^(1.4)$ ) ]] ; then
         test $v 3
     fi
 done
+
+cd $current_dir
