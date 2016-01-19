@@ -27,7 +27,7 @@ function test {
 
 for v in "1.4" "1.5" "1.6" "1.7" "1.8" "1.9" ; do
     test $v 2
-    if [ $v != "1.4" ] ; then
+    if [[ ! ( $v =~ ^(1.4)$ ) ]] ; then
         test $v 3
     fi
 done

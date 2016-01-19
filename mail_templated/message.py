@@ -29,7 +29,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
                  'html'.
             :type template_name: str
             :param context: A dictionary to be used for template rendering.
-            :type context: bool
+            :type context: dict
 
         Keyword Arguments:
             :param subject: Default message subject.
