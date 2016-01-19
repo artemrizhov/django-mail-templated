@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
-import os
-import platform
+
 
 DESCRIPTION = 'Send emails with Django template system'
 
@@ -20,10 +19,11 @@ CLASSIFIERS = [
     'Framework :: Django',
 ]
 
+
 setup(
     name='django-mail-templated',
     version='2.4.0',
-    packages=['mail_templated', 'mail_templated.tests'],
+    packages=find_packages(),
     include_package_data=True,
     author='Artem Rizhov',
     author_email='artem.rizhov@gmail.com',
