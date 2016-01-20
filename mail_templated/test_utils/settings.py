@@ -1,3 +1,6 @@
+"""
+Django settings for standalone run of tests
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

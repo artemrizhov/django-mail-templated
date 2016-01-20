@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-find -name __pycache__ -exec rm -r {} \;
-find -name "*.pyc" -exec rm {} \;
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-python setup.py sdist upload
+find $DIR -name __pycache__ -exec rm -r {} \;
+find $DIR -name "*.pyc" -exec rm {} \;
+
+python $DIR/setup.py sdist upload
