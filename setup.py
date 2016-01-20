@@ -20,7 +20,7 @@ CLASSIFIERS = [
     'Framework :: Django',
 ]
 
-VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', '2.4.3')
+VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', '2.4.4')
 
 
 setup(
