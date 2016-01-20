@@ -2,4 +2,4 @@ include LICENSE
 include README.rst
 include CHANGELOG.rst
 recursive-include mail_templated/templates *
-recursive-include mail_templated/tests *
+recursive-include mail_templated/test_utils *

@@ -1,3 +1,8 @@
+# The test cases should reside in tests*.py in order to be discoverable by
+# unittest, and also should reside at the top level of the tests module to work
+# with all Django versions. Other test utils are moved to a separated module to
+# avoid loading of the test cases before Django initialisation, because this
+# caused import errors with old Django version.
 import os
 import pickle
 
@@ -7,7 +12,7 @@ from django.template.loader import get_template
 from django.test import TestCase
 from django.utils import translation
 
-from .. import send_mail, EmailMessage
+from . import send_mail, EmailMessage
 
 
 CONTEXT2 = {'name': 'User2'}
@@ -90,7 +95,8 @@ class SendMailTestCase(BaseMailTestCase):
         self.assertEqual(message.alternatives[1][1], 'text/html')
 
     def test_attachment(self):
-        file_name = os.path.join(os.path.dirname(__file__), 'attachment.png')
+        file_name = os.path.join(os.path.dirname(__file__), 'test_utils',
+                                 'attachment.png')
         with open(file_name, 'rb') as f:
             content = f.read()
         attachment = ('attachment.png', content, 'image/png')
@@ -229,7 +235,8 @@ class EmailMessageTestCase(BaseMailTestCase):
             'from@inter.net', ['to@inter.net'])
         # Attach binary file because of strange encoding issue with textual
         # attachments on Django 1.6-1.8 and Python 3.
-        file_name = os.path.join(os.path.dirname(__file__), 'attachment.png')
+        file_name = os.path.join(os.path.dirname(__file__), 'test_utils',
+                                 'attachment.png')
         message.attach_file(file_name, 'image/png')
         message.send()
         self._assertMessage(

@@ -54,6 +54,13 @@ And register the app in your settings file:
         'mail_templated'
     )
 
+Also it is good idea to ensure that the app is installed successfully and
+is fully compatible with your environment:
+
+.. code-block:: console
+
+    python manage.py test mail_templated
+
 Usage
 =================
 
@@ -199,9 +206,41 @@ Look into the `source code
 <https://github.com/artemrizhov/django-mail-templated>`_
 for more info.
 
-Please `create a GitHub issue
-<https://github.com/artemrizhov/django-mail-templated/issues/new>`_
-if you have any notes. Pull requests are welcome!
+Troubleshooting
+=================
+
+If the app does not work as expected then please follow these steps:
+
+1.  Update to the latest version:
+
+    .. code-block:: console
+
+        pip install -U django-mail-templated
+
+1.  Run tests within your current Django project environment:
+
+    .. code-block:: console
+
+        python manage.py test mail_templated
+
+1.  Run tests in standalone mode:
+
+    .. code-block:: console
+
+        python -m mail_templated.tests.run
+
+1.  `create a GitHub issue
+    <https://github.com/artemrizhov/django-mail-templated/issues/new>`_.
+
+You also are welcome to try to fix the problem by yourself:
+
+1.  Fork and clone the `GitHub repository
+    <https://github.com/artemrizhov/django-mail-templated>`_.
+
+1.  Add a test case that demonstrates the problem.
+
+1.  Fix it and create a pull request.
+
 
 Useful links
 =================

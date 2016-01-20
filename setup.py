@@ -1,3 +1,4 @@
+import os
 from setuptools import setup, find_packages
 
 
@@ -19,10 +20,12 @@ CLASSIFIERS = [
     'Framework :: Django',
 ]
 
+VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', '2.4.3')
+
 
 setup(
     name='django-mail-templated',
-    version='2.4.3',
+    version=VERSION,
     packages=find_packages(),
     include_package_data=True,
     author='Artem Rizhov',
@@ -33,5 +36,5 @@ setup(
     long_description=LONG_DESCRIPTION,
     platforms=['any'],
     classifiers=CLASSIFIERS,
-    test_suite='runtests.runtests',
+    test_suite='mail_templated.test_utils.run.run_tests',
 )

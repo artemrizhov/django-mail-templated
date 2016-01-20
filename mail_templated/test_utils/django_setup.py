@@ -5,9 +5,9 @@ import os
 import sys
 
 
-def init_django():
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
-    test_dir = os.path.dirname(__file__)
+def setup_django():
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'mail_templated.test_utils.settings'
+    test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     sys.path.insert(0, test_dir)
 
     import django
