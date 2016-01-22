@@ -1,14 +1,14 @@
 Django-Mail-Templated Changelog
 ===============================
 
-2.4.0
+2.4.x
 -----
 
 - Fixed setup.py, added missing files to the package.
 
 - Added more tests.
 
-2.3.0
+2.3.x
 -----
 
 - Made ``template_name`` argument required when ``render=True`` passed
@@ -20,12 +20,12 @@ Django-Mail-Templated Changelog
 
 - Added more tests.
 
-2.2.0
+2.2.x
 -----
 
 - Fixed compatibility with Python 3
 
-2.1.0
+2.1.x
 -----
 
 - Added full support of template inheritance.
@@ -37,7 +37,7 @@ Django-Mail-Templated Changelog
 - ``render=True`` is now ignored on initialisation without template. Raised
   error before.
 
-2.0.0
+2.0.x
 -----
 
 *This is intermediate version with broken pickling/unpickling feature.*
@@ -54,7 +54,7 @@ Using of next or previous version is highly recommended.
 
 - Improved tests.
 
-1.0.0
+1.0.x
 -----
 
 - Fixed the multilingual templates support for Django >= 1.8.

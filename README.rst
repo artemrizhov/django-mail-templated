@@ -4,6 +4,21 @@ Django-Mail-Templated
 
 **Send emails using Django template system**
 
+Table of Contents
+=================
+
+*   `Overview`_
+
+*   `Installation`_
+
+*   `Usage`_
+
+*   `Troubleshooting`_
+
+*   `Useful links`_
+
+*   `Changelog <https://github.com/artemrizhov/django-mail-templated/blob/master/CHANGELOG.rst>`_
+
 Overview
 =================
 
