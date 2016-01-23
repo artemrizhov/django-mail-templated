@@ -16,11 +16,14 @@ CLASSIFIERS = [
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.4",
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Framework :: Django',
 ]
 
-VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', '2.4.5')
+VERSION = '2.4.7'
+VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', VERSION)
 
 
 setup(
