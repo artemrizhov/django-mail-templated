@@ -84,7 +84,9 @@ Creating templates
 
 Each email template should extend ``"mail_templated/base.tpl"`` or its clone
 either directly or via descendants.
-The base template contains the markups of the email components. This aproach eliminates the dependancy on the inner implementation of the Django template engine which tends to change.
+The base template contains markers of the email parts. This aproach
+eliminates the dependancy on the inner implementation of the Django template
+engine which tends to change.
 
 Note that first and last newlines inside of block contents will be removed.
 
