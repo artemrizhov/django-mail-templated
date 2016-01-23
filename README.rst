@@ -69,7 +69,7 @@ And register the app in your settings file:
         'mail_templated'
     )
 
-Also it is a good idea to ensure that the app is installed successfully and
+It is also a good practice to ensure that the app is installed successfully and
 is fully compatible with your environment:
 
 .. code-block:: console
@@ -82,7 +82,7 @@ Usage
 Creating templates
 ------------------
 
-Each email template should extend ``"mail_templated/base.tpl"`` or it's clone
+Each email template should extend ``"mail_templated/base.tpl"`` or its clone
 either directly or via descendants.
 This is the only way to provide robust and full support for template
 inheritance, because Django template engine takes a lot of changes from time
@@ -198,15 +198,15 @@ Sending messages
     except TemplateDoesNotExist:
         message.load_template('email/default.tpl')
 
-    # You can also set template object manually.
+    # You can also set the template object manually.
     message.template = get_template('mail_templated_test/plain.tpl')
 
-    # Force template rendering. If template is not loaded on this stage then
+    # Force template rendering. If template was not loaded at this stage then
     # it will be loaded automatically, so you actually don't have to call
     # `load_template()` manually.
     message.render()
 
-    # Get compiled subject and body as if you'd use standard Django message
+    # Get compiled subject and body as if you are using the standard Django message
     # object.
     logger.debug('Sending message with subject "{}" and body "{}"'.format(
         message.subject, message.body))
@@ -230,7 +230,7 @@ for more info.
 Troubleshooting
 =================
 
-If the app does not work as expected then please follow these steps:
+If the app does not work as expected please follow the following steps:
 
 #.  Update to the latest version:
 
@@ -253,7 +253,7 @@ If the app does not work as expected then please follow these steps:
 #.  `Create a GitHub issue
     <https://github.com/artemrizhov/django-mail-templated/issues/new>`_.
 
-You also are welcome to try to fix the problem by yourself:
+You are also very welcome to try fixing the problem by yourself:
 
 #.  Fork and clone the `GitHub repository
     <https://github.com/artemrizhov/django-mail-templated>`_.
