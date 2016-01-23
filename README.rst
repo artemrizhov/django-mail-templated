@@ -84,9 +84,7 @@ Creating templates
 
 Each email template should extend ``"mail_templated/base.tpl"`` or its clone
 either directly or via descendants.
-This is the only way to provide robust and full support for template
-inheritance, because Django template engine takes a lot of changes from time
-to time.
+The base template contains the markups of the email components. This aproach eliminates the dependancy on the inner implementation of the Django template engine which tends to change.
 
 Note that first and last newlines inside of block contents will be removed.
 
@@ -183,7 +181,7 @@ Sending messages
     message.from_email = from_email
     message.to = [user.email]
 
-    # Attach alternatives, files, etc., as if you'd use standard
+    # Attach alternatives, files, etc., as if you are using the standard
     # EmailMultiAlternatives object.
     message.attach_alternative('HTML alternative', 'text/html')
 
@@ -192,7 +190,7 @@ Sending messages
     # Then restore when ready to continue.
     message = pickle.loads(get_message_from_db())
 
-    # Force immediate template load if you want to handle this somehow.
+    # Force the immediate template load if you want to handle it somehow.
     try:
         message.load_template('email/hello.tpl')
     except TemplateDoesNotExist:
@@ -201,9 +199,9 @@ Sending messages
     # You can also set the template object manually.
     message.template = get_template('mail_templated_test/plain.tpl')
 
-    # Force template rendering. If template was not loaded at this stage then
+    # Force template rendering. If the template was not loaded at this stage then
     # it will be loaded automatically, so you actually don't have to call
-    # `load_template()` manually.
+    # the `load_template()` method manually.
     message.render()
 
     # Get compiled subject and body as if you are using the standard Django message
@@ -212,11 +210,11 @@ Sending messages
         message.subject, message.body))
 
     # Change subject and body manually at any time. But remember they can be
-    # overwritten by template rendering if not rendered yet.
+    # overwritten by the template rendering if not rendered yet.
     message.subject = subject
     message.body = body
 
-    # This is also good point for serialization. Subject and body will be also
+    # This is also a good point for serialization. Subject and body will also be
     # serialized, the template system will not be used after deserialization.
     message = pickle.loads(pickle.dumps(message))
 
