@@ -25,7 +25,7 @@ Overview
 This is a tiny wrapper around the standard ``EmailMessage`` class and
 ``send_mail()`` function that provides an easy way to create email messages
 using the `Django template system
-<https://docs.djangoproject.com/es/1.9/topics/templates/>`_
+<https://docs.djangoproject.com/es/1.9/topics/templates/>`_.
 Just pass ``template_name`` and ``context`` as the first parameters then use as
 normal.
 
@@ -34,8 +34,8 @@ normal.
 * Built with OOP, KISS and flexibility in mind. Really small and simple, but
   yet full-featured (I hope).
 
-* Extends and mimics the built-in Django ``EmailMessage`` and ``send_mail()``.
-  Compatible as much as possible.
+* Extends and mimics the built-in Django's ``EmailMessage`` and
+  ``send_mail()``. Compatible as much as possible.
 
 * Fully supports Django template system including template inheritance
   (thanks to *BradWhittington* for the note about the problem).
@@ -69,7 +69,7 @@ And register the app in your settings file:
         'mail_templated'
     )
 
-Also it is good idea to ensure that the app is installed successfully and
+Also it is a good idea to ensure that the app is installed successfully and
 is fully compatible with your environment:
 
 .. code-block:: console
@@ -78,6 +78,9 @@ is fully compatible with your environment:
 
 Usage
 =================
+
+Creating templates
+------------------
 
 Each email template should extend ``"mail_templated/base.tpl"`` or it's clone
 either directly or via descendants.
@@ -142,6 +145,9 @@ Note that first and last newlines inside of block contents will be removed.
     {% block body %}
     This is a plain text message.
     {% endblock %}
+
+Sending messages
+----------------
 
 **Fast method using ``send_mail()`` function:**
 
@@ -238,7 +244,7 @@ If the app does not work as expected then please follow these steps:
 
         python manage.py test mail_templated
 
-#.  Run tests in standalone mode:
+#.  Run tests in a standalone mode:
 
     .. code-block:: console
 
