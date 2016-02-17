@@ -39,6 +39,10 @@ class EmailMessage(mail.EmailMultiAlternatives):
             :param render: If `True`, render template and evaluate `subject`
                 and `body` properties immediately. Default is `False`.
             :type render: bool
+            :param clean: If `True', remove any template specific properties
+                from the message object. This forces immediate rendering like
+                the `render` parameter does. Default is `False`.
+            :type clean: bool
 
         Other arguments are passed to the base class method as is.
         """
@@ -47,13 +51,14 @@ class EmailMessage(mail.EmailMultiAlternatives):
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
         render = kwargs.pop('render', False)
+        clean = kwargs.pop('clean', False)
         self.template = None
         self._is_rendered = False
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if render:
-            self.render()
+        if render or clean:
+            self.render(clean=clean)
 
     @property
     def is_rendered(self):
@@ -70,8 +75,15 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         self.template = get_template(template_name)
 
-    def render(self):
-        """Render email with the current context"""
+    def render(self, clean=False):
+        """
+        Render email with the current context
+
+        Arguments:
+            :param clean: If `True', remove any template specific properties
+                from the message object. Default is `False`.
+            :type clean: bool
+        """
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
@@ -90,16 +102,46 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 # Add alternative content.
                 self.attach_alternative(html, 'text/html')
         self._is_rendered = True
+        if clean:
+            self.clean()
 
     def send(self, *args, **kwargs):
         """
         Render email if needed and send it
 
-        All arguments are passed to the base class method.
+        Keyword Arguments:
+            :param clean: If `True', remove any template specific properties
+                from the message object before sending. Default is `False`.
+            :type clean: bool
+
+        Other arguments are passed to the base class method as is.
         """
+        clean = kwargs.pop('clean', False)
         if not self._is_rendered:
             self.render()
+        if clean:
+            self.clean()
         return super(EmailMessage, self).send(*args, **kwargs)
+
+    def clean(self):
+        """
+        Remove any template specific properties from the message object.
+
+        Useful if you want to serialize rendered message without
+        template-specific properties. Also allows to avoid conflicts with
+        Djrill/Mandrill and other third-party systems that may fail because
+        of non-standard properties of the message object.
+
+        The messages should be rendered already,
+        or you will have to setup the `context` and `template`/`template_name`
+        after deserialization.
+
+        In most cases you can pass the `clean` parameter to the constructor
+        or another appropriate method of this class.
+        """
+        del self.context
+        del self.template
+        del self.template_name
 
 
     def _get_block(self, content, name):
