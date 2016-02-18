@@ -6,6 +6,9 @@
 .. |_| unicode:: 0xA0
   :trim:
 
+.. meta::
+   :google-site-verification: Wo1vgdtvf4sgKDTxIHRDzM4YXH7mWP24zLNWCOkKbeY
+
 Welcome to Django |_| Mail |_| Templated documentation!
 =======================================================
 
