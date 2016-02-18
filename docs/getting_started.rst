@@ -1,4 +1,4 @@
-Getting Started
+Getting started
 ===============
 
 Installation
@@ -30,11 +30,8 @@ is fully compatible with your environment:
 Creating templates
 ------------------
 
-Each email template should extend ``"mail_templated/base.tpl"`` or it's clone
-either directly or via descendants.
-This is the only way to provide robust and full support for template
-inheritance, because Django template engine takes a lot of changes from time
-to time.
+Each email template should extend :ref:`mail_templated/base.tpl <inheritance>`
+or it's clone either directly or via descendants.
 
 Note that first and last newlines inside of block contents will be removed.
 

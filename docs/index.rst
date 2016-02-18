@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 .. |_| unicode:: 0xA0
-  :trim:
+   :trim:
 
 .. meta::
    :google-site-verification: Wo1vgdtvf4sgKDTxIHRDzM4YXH7mWP24zLNWCOkKbeY
@@ -63,6 +63,7 @@ Table of Contents
    :maxdepth: 2
 
    getting_started
+   advanced_usage
    api
    troubleshuting
    changelog
