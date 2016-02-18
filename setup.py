@@ -40,4 +40,5 @@ setup(
     platforms=['any'],
     classifiers=CLASSIFIERS,
     test_suite='mail_templated.test_utils.run.run_tests',
+    install_requires = ['django'],
 )
