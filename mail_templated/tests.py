@@ -130,7 +130,29 @@ class SendMailTestCase(BaseMailTestCase):
         self._send_mail(
             'mail_templated_test/whitespaces.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'], 'Hello User',
-            '  User, this is a message with preceding and trailing whitespaces.  ')
+            '  User, this is a message with preceding and trailing '
+            'whitespaces.  ')
+
+    def test_override_settings(self):
+        """This also checks the HTML entities in the email part tags"""
+        try:
+            from django.test import override_settings
+        except ImportError:
+            from unittest import SkipTest
+            raise SkipTest('`override_settings()` is not supported by this '
+                           'Django version')
+        tag_format = '<!--{bound}_{block}-->'
+        tag_var_format = '{BOUND}_{BLOCK}_PART'
+        with override_settings(
+                MAIL_TEMPLATED_TAG_FORMAT=tag_format,
+                MAIL_TEMPLATED_TAG_VAR_FORMAT=tag_var_format):
+            from mail_templated.conf import app_settings
+            self.assertEqual(app_settings.TAG_FORMAT, tag_format)
+            self.assertEqual(app_settings.TAG_VAR_FORMAT, tag_var_format)
+            self._send_mail(
+                'mail_templated_test/alternate_tags.tpl', {'name': 'User'},
+                'from@inter.net', ['to@inter.net'], 'Hello User',
+                'User, this is a plain text message.')
 
 
 class EmailMessageTestCase(BaseMailTestCase):

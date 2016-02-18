@@ -1,10 +1,16 @@
 from django.core import mail
 from django.template import Context
 from django.template.loader import get_template
+from django.utils.safestring import mark_safe
+
+from .conf import app_settings
 
 
 class EmailMessage(mail.EmailMultiAlternatives):
     """Extends standard EmailMessage class with ability to use templates"""
+
+    _extra_context = None
+    _extra_context_fingerprint = None
 
     def __init__(self, template_name=None, context={}, *args, **kwargs):
         """
@@ -59,6 +65,21 @@ class EmailMessage(mail.EmailMultiAlternatives):
     def is_rendered(self):
         return self._is_rendered
 
+    @property
+    def extra_context(self):
+        cls = self.__class__
+        tag_var_format = str(app_settings.TAG_VAR_FORMAT)
+        tag_format = str(app_settings.TAG_FORMAT)
+        if cls._extra_context_fingerprint != (tag_var_format, tag_format):
+            cls._extra_context = dict(
+                (tag_var_format.format(BLOCK=block.upper(),
+                                       BOUND=bound.upper()),
+                 mark_safe(tag_format.format(block=block, bound=bound)))
+                for block in ('subject', 'body', 'html')
+                for bound in ('start', 'end'))
+            cls._extra_context_fingerprint = (tag_var_format, tag_format)
+        return cls._extra_context
+
     def load_template(self, template_name):
         """
         Load the specified template
@@ -75,7 +96,10 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
-        result = self.template.render(Context(self.context))
+        context = Context(self.context)
+        # Add tag strings to the context dict.
+        context.update(self.extra_context)
+        result = self.template.render(context)
         # Don't overwrite default static value with empty one.
         self.subject = self._get_block(result, 'subject') or self.subject
         self.body = self._get_block(result, 'body') or self.body
@@ -103,7 +127,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
 
     def _get_block(self, content, name):
-        marks = tuple('{{#{}_{}#}}'.format(p, name) for p in ('start', 'end'))
+        marks = tuple(app_settings.TAG_FORMAT.format(block=name, bound=bound)
+                      for bound in ('start', 'end'))
         start, end = (content.find(m) for m in marks)
         if start == -1 or end == -1:
             return
