@@ -3,6 +3,10 @@ Django Mail Templated
 
 **Send emails using Django template system**
 
+.. image:: https://readthedocs.org/projects/django-mail-templated/badge/?version=latest
+:target: http://django-mail-templated.readthedocs.org/en/latest/?badge=latest
+:alt: Documentation Status
+
 This is a tiny wrapper around the standard ``EmailMessage`` class and
 ``send_mail()`` function that provides an easy way to create email messages
 using the `Django template system
