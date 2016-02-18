@@ -1,5 +1,5 @@
-Django-Mail-Templated Changelog
-===============================
+Changelog
+=========
 
 2.4.x
 -----
