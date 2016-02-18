@@ -11,6 +11,10 @@ Django Mail Templated
    :target: https://badge.fury.io/py/django-mail-templated
    :alt: PyPI Package
 
+.. image:: https://circleci.com/gh/artemrizhov/django-mail-templated/tree/master.svg?style=shield
+   :target: https://circleci.com/gh/artemrizhov/django-mail-templated/tree/master
+   :alt: CircleCI Status
+
 This is a tiny wrapper around the standard ``EmailMessage`` class and
 ``send_mail()`` function that provides an easy way to create email messages
 using the `Django template system
