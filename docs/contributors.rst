@@ -1,8 +1,6 @@
 Contributors
 ============
 
-.. toctree::
-
 Author:
 
 `Artem Rizhov <https://github.com/artemrizhov>`_
