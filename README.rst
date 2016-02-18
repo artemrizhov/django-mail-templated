@@ -10,6 +10,8 @@ using the `Django template system
 Just pass ``template_name`` and ``context`` as the first parameters then use as
 normal.
 
+Full documentation is available at http://django-mail-templated.rtfd.org/
+
 Features
 --------
 
