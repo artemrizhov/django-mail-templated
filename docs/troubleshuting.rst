@@ -1,7 +1,7 @@
 Troubleshooting
 =================
 
-If the app does not work as expected then please follow these steps:
+If the app does not work as expected please follow the following steps:
 
 #.  Update to the latest version:
 
@@ -24,7 +24,7 @@ If the app does not work as expected then please follow these steps:
 #.  `Create a GitHub issue
     <https://github.com/artemrizhov/django-mail-templated/issues/new>`_.
 
-You also are welcome to try to fix the problem by yourself:
+You are also very welcome to try fixing the problem by yourself:
 
 #.  Fork and clone the `GitHub repository
     <https://github.com/artemrizhov/django-mail-templated>`_.
@@ -32,3 +32,4 @@ You also are welcome to try to fix the problem by yourself:
 #.  Add a test case that demonstrates the problem.
 
 #.  Fix it and create a pull request.
+

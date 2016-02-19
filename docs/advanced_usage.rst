@@ -8,7 +8,7 @@ Base template and inheritance
 
 The email template is rendered as a solid document, and all email message parts
 (subject, body and html) appears concatenated after rendering.
-The base template ``mail_templated/base.tpl`` contains special markup for the
+The base template ``mail_templated/base.tpl`` contains special markers for the
 email message parts, so that they can be found and extracted after rendering.
 It looks likes this:
 
@@ -22,6 +22,8 @@ It looks likes this:
 
   {{ '{#start_html#}' }}{% block html %}{% endblock %}{{ '{#end_html#}' }}
 
+This approach eliminates the dependency on the inner implementation of the
+Django template engine which tends to change.
 This is the only way to provide robust and full support for template
 inheritance. Django template engine takes a lot of changes from time to time,
 so it would be a bad idea to extract and render the blocks separately.

@@ -8,6 +8,9 @@
 from django.core import mail
 from django.template import Context
 from django.template.loader import get_template
+from django.utils.safestring import mark_safe
+
+from .conf import app_settings
 
 
 class EmailMessage(mail.EmailMultiAlternatives):
@@ -19,6 +22,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
     :class:`django.core.mail.EmailMessage`
         Documentation for the standard email message classes.
     """
+
+    _extra_context = None
+    _extra_context_fingerprint = None
 
     def __init__(self, template_name=None, context={}, *args, **kwargs):
         """
@@ -90,23 +96,43 @@ class EmailMessage(mail.EmailMultiAlternatives):
             |body|
         render : bool
             |render|
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. This forces immediate rendering even if ``render``
+            parameter is ``False``. Default is ``False``.
         """
         self.template_name = template_name
         self.context = context
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
         render = kwargs.pop('render', False)
+        clean = kwargs.pop('clean', False)
         self.template = None
         self._is_rendered = False
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if render:
-            self.render()
+        if render or clean:
+            self.render(clean=clean)
 
     @property
     def is_rendered(self):
         return self._is_rendered
+
+    @property
+    def extra_context(self):
+        cls = self.__class__
+        tag_var_format = str(app_settings.TAG_VAR_FORMAT)
+        tag_format = str(app_settings.TAG_FORMAT)
+        if cls._extra_context_fingerprint != (tag_var_format, tag_format):
+            cls._extra_context = dict(
+                (tag_var_format.format(BLOCK=block.upper(),
+                                       BOUND=bound.upper()),
+                 mark_safe(tag_format.format(block=block, bound=bound)))
+                for block in ('subject', 'body', 'html')
+                for bound in ('start', 'end'))
+            cls._extra_context_fingerprint = (tag_var_format, tag_format)
+        return cls._extra_context
 
     def load_template(self, template_name):
         """
@@ -120,14 +146,23 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         self.template = get_template(template_name)
 
-    def render(self):
+    def render(self, clean=False):
         """
         Render email with the current context
+
+        Arguments
+        ---------
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. Default is ``False``.
         """
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
-        result = self.template.render(Context(self.context))
+        context = Context(self.context)
+        # Add tag strings to the context dict.
+        context.update(self.extra_context)
+        result = self.template.render(context)
         # Don't overwrite default static value with empty one.
         self.subject = self._get_block(result, 'subject') or self.subject
         self.body = self._get_block(result, 'body') or self.body
@@ -142,21 +177,54 @@ class EmailMessage(mail.EmailMultiAlternatives):
                 # Add alternative content.
                 self.attach_alternative(html, 'text/html')
         self._is_rendered = True
+        if clean:
+            self.clean()
 
     def send(self, *args, **kwargs):
         """
         Send email message, render if it is not rendered yet.
 
-        All arguments are passed to
+        Note
+        ----
+        Any extra arguments are passed to
         :class:`EmailMultiAlternatives.send() <django.core.mail.EmailMessage>`.
+
+        Keyword Arguments
+        -----------------
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. Default is ``False``.
         """
+        clean = kwargs.pop('clean', False)
         if not self._is_rendered:
             self.render()
+        if clean:
+            self.clean()
         return super(EmailMessage, self).send(*args, **kwargs)
+
+    def clean(self):
+        """
+        Remove any template specific properties from the message object.
+
+        Useful if you want to serialize rendered message without
+        template-specific properties. Also allows to avoid conflicts with
+        Djrill/Mandrill and other third-party systems that may fail because
+        of non-standard properties of the message object.
+
+        The messages should be rendered already, or you will have to setup the
+        ``context`` and ``template``/``template_name`` after deserialization.
+
+        In most cases you can pass the ``clean`` parameter to the constructor
+        or another appropriate method of this class.
+        """
+        del self.context
+        del self.template
+        del self.template_name
 
 
     def _get_block(self, content, name):
-        marks = tuple('{{#{}_{}#}}'.format(p, name) for p in ('start', 'end'))
+        marks = tuple(app_settings.TAG_FORMAT.format(block=name, bound=bound)
+                      for bound in ('start', 'end'))
         start, end = (content.find(m) for m in marks)
         if start == -1 or end == -1:
             return

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+2.5.x
+-----
+
+- Added application settings.
+
+- Added ability to cleanup the message object (enabled in ``send_mail()`` by
+  default).
+
 2.4.x
 -----
 

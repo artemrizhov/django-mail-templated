@@ -22,7 +22,7 @@ CLASSIFIERS = [
     'Framework :: Django',
 ]
 
-VERSION = '2.4.7'
+VERSION = '2.5.0'
 VERSION = os.environ.get('MAIL_TEMPLATED_VERSION', VERSION)
 
 
@@ -40,4 +40,5 @@ setup(
     platforms=['any'],
     classifiers=CLASSIFIERS,
     test_suite='mail_templated.test_utils.run.run_tests',
+    install_requires = ['django'],
 )
