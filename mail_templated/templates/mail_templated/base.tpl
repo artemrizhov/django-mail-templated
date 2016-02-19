@@ -1,5 +1,5 @@
-{{ '{#start_subject#}' }}{% block subject %}{% endblock %}{{ '{#end_subject#}' }}
+{{ TAG_START_SUBJECT }}{% block subject %}{% endblock %}{{ TAG_END_SUBJECT }}
 
-{{ '{#start_body#}' }}{% block body %}{% endblock %}{{ '{#end_body#}' }}
+{{ TAG_START_BODY }}{% block body %}{% endblock %}{{ TAG_END_BODY }}
 
-{{ '{#start_html#}' }}{% block html %}{% endblock %}{{ '{#end_html#}' }}
+{{ TAG_START_HTML }}{% block html %}{% endblock %}{{ TAG_END_HTML }}

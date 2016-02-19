@@ -19,6 +19,7 @@ def send_mail(template_name, context, from_email, recipient_list,
     connection = connection or mail.get_connection(username=auth_user,
                                                    password=auth_password,
                                                    fail_silently=fail_silently)
+    clean = kwargs.pop('clean', True)
     return EmailMessage(
         template_name, context, from_email, recipient_list,
-        connection=connection, *args, **kwargs).send()
+        connection=connection, *args, **kwargs).send(clean=clean)

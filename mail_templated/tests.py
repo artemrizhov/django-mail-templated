@@ -22,14 +22,20 @@ BODY2 = 'User2, this is a plain text message.'
 
 class BaseMailTestCase(TestCase):
 
-    def _assertMessage(self, from_email, to, subject, body):
+    def _assertMessage(self, from_email, to, subject, body, clean=False):
         self.assertEqual(len(mail.outbox), 1)
         message = mail.outbox[0]
         self.assertEqual(message.from_email, from_email)
         self.assertEqual(message.to, to)
         self.assertEqual(message.subject, subject)
         self.assertEqual(message.body, body)
+        self._assertMessageClean(message, clean)
         return message
+
+    def _assertMessageClean(self, message, clean):
+        self.assertNotEqual(hasattr(message, 'context'), clean)
+        self.assertNotEqual(hasattr(message, 'template'), clean)
+        self.assertNotEqual(hasattr(message, 'template_name'), clean)
 
 
 class SendMailTestCase(BaseMailTestCase):
@@ -37,7 +43,8 @@ class SendMailTestCase(BaseMailTestCase):
     def _send_mail(self, template_name, context, from_email, to,
                    res_subject, res_body, *args, **kwargs):
         send_mail(template_name, context, from_email, to, *args, **kwargs)
-        return self._assertMessage(from_email, to, res_subject, res_body)
+        return self._assertMessage(from_email, to, res_subject, res_body,
+                                   clean=kwargs.pop('clean', True))
 
     def test_plain(self):
         self._send_mail(
@@ -130,17 +137,47 @@ class SendMailTestCase(BaseMailTestCase):
         self._send_mail(
             'mail_templated_test/whitespaces.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'], 'Hello User',
-            '  User, this is a message with preceding and trailing whitespaces.  ')
+            '  User, this is a message with preceding and trailing '
+            'whitespaces.  ')
+
+    def test_override_settings(self):
+        """This also checks the HTML entities in the email part tags"""
+        try:
+            from django.test import override_settings
+        except ImportError:
+            from unittest import SkipTest
+            raise SkipTest('`override_settings()` is not supported by this '
+                           'Django version')
+        tag_format = '<!--{bound}_{block}-->'
+        tag_var_format = '{BOUND}_{BLOCK}_PART'
+        with override_settings(
+                MAIL_TEMPLATED_TAG_FORMAT=tag_format,
+                MAIL_TEMPLATED_TAG_VAR_FORMAT=tag_var_format):
+            from mail_templated.conf import app_settings
+            self.assertEqual(app_settings.TAG_FORMAT, tag_format)
+            self.assertEqual(app_settings.TAG_VAR_FORMAT, tag_var_format)
+            self._send_mail(
+                'mail_templated_test/alternate_tags.tpl', {'name': 'User'},
+                'from@inter.net', ['to@inter.net'], 'Hello User',
+                'User, this is a plain text message.')
+
+    def test_cleanup(self):
+        self._send_mail(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.', clean=True)
 
 
 class EmailMessageTestCase(BaseMailTestCase):
 
     def _send_mail(self, template_name, context, from_email, to,
                    res_subject, res_body, *args, **kwargs):
+        clean = kwargs.pop('clean', False)
         message = EmailMessage(template_name, context, from_email, to,
                                *args, **kwargs)
-        message.send()
-        return self._assertMessage(from_email, to, res_subject, res_body)
+        message.send(clean=clean)
+        return self._assertMessage(from_email, to, res_subject, res_body,
+                                   clean=clean)
 
     def test_plain(self):
         self._send_mail(
@@ -246,6 +283,46 @@ class EmailMessageTestCase(BaseMailTestCase):
         self.assertEqual(message.attachments[0][0], 'attachment.png')
         self.assertTrue(len(message.attachments[0][1]) > 0)
         self.assertEqual(message.attachments[0][2], 'image/png')
+
+    def test_cleanup(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        self._assertMessageClean(message, False)
+        message.render()
+        self._assertMessageClean(message, False)
+        message.clean()
+        self._assertMessageClean(message, True)
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.', clean=True)
+
+    def test_cleanup_create(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], clean=True)
+        self._assertMessageClean(message, True)
+
+    def test_cleanup_render(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        self._assertMessageClean(message, False)
+        message.render(clean=True)
+        self._assertMessageClean(message, True)
+
+    def test_cleanup_send(self):
+        message = EmailMessage(
+            'mail_templated_test/plain.tpl', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'])
+        self._assertMessageClean(message, False)
+        message.render()
+        self._assertMessageClean(message, False)
+        message.send(clean=True)
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.', clean=True)
 
 
 class RenderTestCase(BaseMailTestCase):
