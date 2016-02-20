@@ -63,7 +63,7 @@ function test {
     if $test_install ; then
         activate $v $pv true
 
-        # Install a fresh version application.
+        # Install a fresh version of the application.
         find $DIR \( -name "*.pyc" -o -name __pycache__ \) -delete
         pip install -U --force-reinstall "$DIR/dist/django-mail-templated-test.tar.gz"
 

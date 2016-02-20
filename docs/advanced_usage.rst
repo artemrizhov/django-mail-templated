@@ -516,19 +516,166 @@ When rendered, the message object becomes very similar to the standard Django's
 the :attr:`~mail_templated.EmailMessage.is_rendered` property.
 
 
-.. Sending multiple emails with same template
-   ------------------------------------------
-
-.. Using with third-party libraries
-   --------------------------------
-
-
-More examples
+Serialization
 -------------
+
+**mail_templated** supports the :mod:`python:pickle` module. You can serialize
+the message object at any stage. However what really makes sense is serializing
+before invoking the :meth:`~mail_templated.EmailMessage.load_template()` method
+or after invoking the :meth:`~mail_templated.EmailMessage.render()` method.
+If you decide to serialize just between the calls to these methods then you
+will lost the compiled template instance, because it can not be serialized with
+``pickle``.
+
+Let's play with the email object a little.
 
 .. code-block:: python
 
-    # Serialize message after initialization if needed.
-    save_message_to_db(pickle.dumps(message))
-    # Then restore when ready to continue.
-    message = pickle.loads(get_message_from_db())
+    >>> import pickle
+    >>> from mail_templated import EmailMessage
+    >>> message = EmailMessage('email/message.tpl', {})
+
+As soon as the message exists, you can serialize it.
+
+.. code-block:: python
+
+    >>> # Serialize the message.
+    >>> pickled_message = pickle.dumps(message)
+    >>> # Let's see how it looks now.
+    >>> print repr(pickled_message)
+    "ccopy_reg\n_reconstructor\np0\n(cmail_templated.message\nEmailMessage\np1\
+    nc__builtin__\nobject\np2\nNtp3\nRp4\n(dp5\nS'body'\np6\nNsS'extra_headers'
+    \np7\n(dp8\nsS'attachments'\np9\n(lp10\nsS'_is_rendered'\np11\nI00\nsS'cc'\
+    np12\n(lp13\nsS'template_name'\np14\nS'mail_templated_test/plain.tpl'\np15\
+    nsS'alternatives'\np16\n(lp17\nsS'bcc'\np18\n(lp19\nsS'to'\np20\n(lp21\nsS'
+    connection'\np22\nNsS'context'\np23\n(dp24\nsS'reply_to'\np25\n(lp26\nsS'fr
+    om_email'\np27\nS'webmaster@localhost'\np28\nsS'subject'\np29\nNsb."
+
+Now you can store it somewhere for later use. Then load and de-serialize the
+message when needed, and it is ready for further processing.
+
+.. code-block:: python
+
+    >>> # De-serialize the message.
+    >>> message2 = pickle.loads(pickled_message)
+    >>> # Check the message state.
+    >>> print repr(message2)
+    <mail_templated.message.EmailMessage object at 0x7ffb8ad2e810>
+    >>> print repr(message2.template)
+    None
+    >>> # The template is not loaded yet. Load the template
+    >>> message2.load_template()
+    >>> # How is it now?
+    >>> print repr(message2.template)
+    <django.template.backends.django.Template object at 0x7ffb8a11c050>
+    >>> # Good! It's ready for rendering.
+
+While the template is loaded, let's try to serialize and de-serialize it again.
+
+.. code-block:: python
+
+    >>> # Serialize/de-serialize again.
+    >>> message3 = pickle.loads(pickle.dumps(message2))
+    >>> # Is the message still alive?
+    >>> print repr(message3)
+    <mail_templated.message.EmailMessage object at 0x7ffb8ad4f790>
+    >>> # Yes, it's still alive, that's good. What about the template?
+    >>> print repr(message3.template)
+    None
+    >>> # Ooops! We lost the template object. So now we have to load it again.
+    >>> message3.load_template()
+    >>> print repr(message3.template)
+    <django.template.backends.django.Template object at 0x7ffb8a0fdf10>
+    >>> # Phew! It's here now.
+
+Actually if lost, the template will be loaded automatically again when you try
+to render it. You will not see any errors. Just your code will do some useless
+extra work.
+
+.. code-block:: python
+
+    >>> message4 = pickle.loads(pickle.dumps(message3))
+    >>> print repr(message4.template)
+    None
+    >>> # Oh no! We lost it again :(
+    >>> message4.render()
+    >>> # Hmm... There is no any error!
+    >>> print repr(message4.template)
+    <django.template.backends.django.Template object at 0x7ffb8a0b4d50>
+    >>> # Magic? No, this is by design!
+
+So, remember to load the template just before the rendering, not before
+serialization.
+
+Once rendered, you can serialize/de-serialize it again without problems.
+
+.. code-block:: python
+
+    >>> # Check the message state.
+    >>> print repr([message4.is_rendered, message4.subject, message4.body])
+    [True, u'Test subject', u'Test body']
+    >>> # Continue the tortures.
+    >>> message5 = pickle.loads(pickle.dumps(message4))
+    >>> # The author said it should work fine now.
+    >>> print repr(message5.template)
+    None
+    >>> # :`(
+    >>> # :```(
+    >>> # But wait!
+    >>> print repr([message5.is_rendered, message5.subject, message5.body])
+    [True, u'Test subject', u'Test body']
+    >>> # Heh, the template is not needed anymore! :D
+
+There are so many combination how you can load, render and serialize the
+message, so that I'm afraid I can't describe all of them here. These examples
+should help you to construct your own combination.
+
+
+Cleanup for third-party libraries
+---------------------------------
+
+There are many third-party libraries that help you to work with email messages.
+If a library can work with the standard :class:`django.core.mail.EmailMessage`
+class then it probably can work without problems with
+:class:`mail_templated.EmailMessage`. However some library may be surprised
+by the additional attributes on the email message object.
+For example, the Djrill app will pass your ``template_name`` to the Mandrill
+service because it provides it's own template system, and it uses the
+``template_name`` parameter too (what a surprise!).
+
+If something similar happens to your messages then you should wipe out
+the tracks of the **mail_templated** app. The most easy way to do this is to
+delete the conflicting attributes. The ``EmailMessage`` class provides a
+convenient method :meth:`~mail_templated.EmailMessage.clean()` for this
+purpose. It removes the most expensive and risky properties -
+:attr:`~mail_templated.EmailMessage.context`,
+:attr:`~mail_templated.EmailMessage.template` and
+:attr:`~mail_templated.EmailMessage.template_name`.
+
+If you use the :func:`~mail_templated.send_mail()` function then the cleanup is
+invoked for you automatically just after rendering. You can disable this
+behaviour by passing the ``clean=False`` keyword argument.
+
+If you use the :class:`~mail_templated.EmailMessage` class then you should care
+of cleanup yourself. Fortunately there are many places where you can invoke the
+``clean()`` method either directly or via special keyword argument ``clean``.
+
+.. code-block:: python
+
+    # Invoke the cleanup right on the initialisation. This also forces the
+    # rendering as if you pass `render=True, clean=True`.
+    message = EmailMessage('email/message.tpl', {}, clean=True)
+    # Call the method manually after rendering.
+    message.render()
+    message.clean()
+    # Pass `clean=True` to the `render()` method.
+    message.render(clean=True)
+    # The `send()` method also supports this argument.
+    message.send(clean=True)
+
+There is no much difference in these variants. Just choice one that makes your
+code clean and clear.
+
+
+.. Sending multiple emails with same template
+   ------------------------------------------

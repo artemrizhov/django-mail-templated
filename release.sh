@@ -2,7 +2,6 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-find $DIR -name __pycache__ -exec rm -r {} \;
-find $DIR -name "*.pyc" -exec rm {} \;
+find $DIR \( -name "*.pyc" -o -name __pycache__ \) -delete
 
 python $DIR/setup.py sdist upload
