@@ -130,7 +130,8 @@ class SendMailTestCase(BaseMailTestCase):
     def test_overridden2(self):
         self._send_mail(
             'mail_templated_test/overridden2.tpl', {'name': 'User'},
-            'from@inter.net', ['to@inter.net'], 'Overridden hello User',
+            'from@inter.net', ['to@inter.net'],
+            'Overridden hello User. Appendix',
             'User, this is overridden message.\nReally.')
 
     def test_whitespaces(self):
