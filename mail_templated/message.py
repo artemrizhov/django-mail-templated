@@ -1,3 +1,10 @@
+"""
+.. module:: mail_templated.message
+   :synopsis: Main classes of django-mail-templated package.
+
+.. moduleauthor:: Artem Rizhov <artem.rizhov@gmail.com>
+"""
+
 from django.core import mail
 from django.template import Context
 from django.template.loader import get_template
@@ -7,7 +14,14 @@ from .conf import app_settings
 
 
 class EmailMessage(mail.EmailMultiAlternatives):
-    """Extends standard EmailMessage class with ability to use templates"""
+    """
+    Extends standard EmailMultiAlternatives class with ability to use templates
+
+    See Also
+    --------
+    :class:`django.core.mail.EmailMessage`
+        Documentation for the standard email message classes.
+    """
 
     _extra_context = None
     _extra_context_fingerprint = None
@@ -24,33 +38,68 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         The class tries to provide interface as close to the standard Django
         classes as possible.
-        The argument list is the same as in the base class except of two first
-        parameters 'subject' and 'body' which are replaced with 'template_name'
-        and 'context'. However you still can pass subject and body as keyword
-        arguments to provide some static content if needed.
+        |main_difference|
 
-        Arguments:
-            :param template_name: A name of template that extends
-                `mail_templated/base.tpl` with blocks 'subject', 'body' and
-                 'html'.
-            :type template_name: str
-            :param context: A dictionary to be used for template rendering.
-            :type context: dict
+        All parameters are optional and can be set at any time prior to calling
+        the :meth:`render()` and :meth:`send()` methods.
 
-        Keyword Arguments:
-            :param subject: Default message subject.
-            :type subject: str
-            :param body: Default message body.
-            :type body: str
-            :param render: If `True`, render template and evaluate `subject`
-                and `body` properties immediately. Default is `False`.
-            :type render: bool
-            :param clean: If `True', remove any template specific properties
-                from the message object. This forces immediate rendering like
-                the `render` parameter does. Default is `False`.
-            :type clean: bool
+        Note
+        ----
 
-        Other arguments are passed to the base class method as is.
+        .. |args_note| replace:: The set of possible parameters is not limited
+            by the list below. Any additional parameters are passed to the
+            constructor of
+            :class:`EmailMultiAlternatives <django.core.mail.EmailMessage>`
+            class.
+
+        |args_note|
+
+        .. |template_name| replace:: The template name that extends
+            `mail_templated/base.tpl` with (optional) blocks ``{% subject %}``,
+            ``{% body %}`` and ``{% html %}``.
+
+        .. |context| replace:: A dictionary to be used as a context for
+            template rendering.
+
+        .. |from_email| replace:: The email address for the "From:" field.
+
+        .. |recipient_list| replace:: The recipient email addresses. Each
+            member of this list will see the other recipients in the "To:"
+            field of the email message.
+
+        .. |subject| replace:: Default message subject. Used if
+            ``{% subject %}`` block is empty or does not exist in the
+            specified email template.
+
+        .. |body| replace:: Default message body. Used if ``{% body %}``
+            block is empty or does not exist in the specified email template.
+
+        .. |render| replace:: If ``True``, render template and set ``subject``,
+            ``body`` and ``html`` properties immediately. Default is ``False``.
+
+        Arguments
+        ---------
+        template_name : str
+            |template_name|
+        context : dict
+            |context|
+        from_email : str
+            |from_email|
+        recipient_list : list
+            |recipient_list|
+
+        Keyword Arguments
+        -----------------
+        subject : str
+            |subject|
+        body : str
+            |body|
+        render : bool
+            |render|
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. This forces immediate rendering even if ``render``
+            parameter is ``False``. Default is ``False``.
         """
         self.template_name = template_name
         self.context = context
@@ -85,60 +134,83 @@ class EmailMessage(mail.EmailMultiAlternatives):
             cls._extra_context_fingerprint = (tag_var_format, tag_format)
         return cls._extra_context
 
-    def load_template(self, template_name):
+    def load_template(self, template_name=None):
         """
-        Load the specified template
+        Load a template by it's name using the current
+        :ref:`template loaders <django:template-loaders>`.
 
-        Arguments:
-            :param template_name: A name of template with optional blocks
-                'subject', 'body' and 'html'.
-            :type template_name: str
+        Arguments
+        ---------
+        template_name : str
+            |template_name| If not specified then the
+            :attr:`~mail_templated.EmailMessage.template_name` property is
+            used.
         """
-        self.template = get_template(template_name)
+        self.template = get_template(template_name or self.template_name)
 
-    def render(self, clean=False):
+    def render(self, context=None, clean=False):
         """
-        Render email with the current context
+        Render email with provided context
 
-        Arguments:
-            :param clean: If `True', remove any template specific properties
-                from the message object. Default is `False`.
-            :type clean: bool
+        Arguments
+        ---------
+        context : dict
+            |context| If not specified then the
+            :attr:`~mail_templated.EmailMessage.context` property is
+            used.
+
+        Keyword Arguments
+        -----------------
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. Default is ``False``.
         """
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
-        context = Context(self.context)
+        context = Context(context or self.context)
         # Add tag strings to the context dict.
         context.update(self.extra_context)
         result = self.template.render(context)
-        # Don't overwrite default static value with empty one.
-        self.subject = self._get_block(result, 'subject') or self.subject
-        self.body = self._get_block(result, 'body') or self.body
+        # Don't overwrite default value with empty one.
+        subject = self._get_block(result, 'subject')
+        if subject:
+            self.subject = self._get_block(result, 'subject')
+        body = self._get_block(result, 'body')
+        is_html_body = False
         # The html block is optional, and it also may be set manually.
         html = self._get_block(result, 'html')
         if html:
-            if not self.body:
-                # This is html only message.
-                self.body = html
-                self.content_subtype = 'html'
+            if not body:
+                # This is an html message without plain text part.
+                body = html
+                is_html_body = True
             else:
                 # Add alternative content.
                 self.attach_alternative(html, 'text/html')
+        # Don't overwrite default value with empty one.
+        if body:
+            self.body = body
+            if is_html_body:
+                self.content_subtype = 'html'
         self._is_rendered = True
         if clean:
             self.clean()
 
     def send(self, *args, **kwargs):
         """
-        Render email if needed and send it
+        Send email message, render if it is not rendered yet.
 
-        Keyword Arguments:
-            :param clean: If `True', remove any template specific properties
-                from the message object before sending. Default is `False`.
-            :type clean: bool
+        Note
+        ----
+        Any extra arguments are passed to
+        :class:`EmailMultiAlternatives.send() <django.core.mail.EmailMessage>`.
 
-        Other arguments are passed to the base class method as is.
+        Keyword Arguments
+        -----------------
+        clean : bool
+            If ``True``, remove any template specific properties from the
+            message object. Default is ``False``.
         """
         clean = kwargs.pop('clean', False)
         if not self._is_rendered:
@@ -156,11 +228,10 @@ class EmailMessage(mail.EmailMultiAlternatives):
         Djrill/Mandrill and other third-party systems that may fail because
         of non-standard properties of the message object.
 
-        The messages should be rendered already,
-        or you will have to setup the `context` and `template`/`template_name`
-        after deserialization.
+        The messages should be rendered already, or you will have to setup the
+        ``context`` and ``template``/``template_name`` after deserialization.
 
-        In most cases you can pass the `clean` parameter to the constructor
+        In most cases you can pass the ``clean`` parameter to the constructor
         or another appropriate method of this class.
         """
         del self.context
@@ -175,7 +246,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
         if start == -1 or end == -1:
             return
         return content[start + len(marks[0]) : end].strip('\n\r')
-
 
     def __getstate__(self):
         """

@@ -1,6 +1,11 @@
-Author: `Artem Rizhov <https://github.com/artemrizhov>`_
+Contributors
+============
 
-Contributors:
+Author:
+
+`Artem Rizhov <https://github.com/artemrizhov>`_
+
+Other contributors:
 
 * `Thomas Parslow <https://github.com/almost>`_
 

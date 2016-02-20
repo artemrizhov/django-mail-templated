@@ -22,13 +22,15 @@ BODY2 = 'User2, this is a plain text message.'
 
 class BaseMailTestCase(TestCase):
 
-    def _assertMessage(self, from_email, to, subject, body, clean=False):
+    def _assertMessage(self, from_email, to, subject, body,
+                       res_content_type='plain', clean=False):
         self.assertEqual(len(mail.outbox), 1)
         message = mail.outbox[0]
         self.assertEqual(message.from_email, from_email)
         self.assertEqual(message.to, to)
         self.assertEqual(message.subject, subject)
         self.assertEqual(message.body, body)
+        self.assertEqual(message.content_subtype, res_content_type)
         self._assertMessageClean(message, clean)
         return message
 
@@ -41,9 +43,11 @@ class BaseMailTestCase(TestCase):
 class SendMailTestCase(BaseMailTestCase):
 
     def _send_mail(self, template_name, context, from_email, to,
-                   res_subject, res_body, *args, **kwargs):
+                   res_subject, res_body, res_content_type='plain',
+                   *args, **kwargs):
         send_mail(template_name, context, from_email, to, *args, **kwargs)
         return self._assertMessage(from_email, to, res_subject, res_body,
+                                   res_content_type,
                                    clean=kwargs.pop('clean', True))
 
     def test_plain(self):
@@ -56,7 +60,7 @@ class SendMailTestCase(BaseMailTestCase):
         self._send_mail(
             'mail_templated_test/plain.html', {'name': 'User'},
             'from@inter.net', ['to@inter.net'], 'Hello User',
-            'User, this is an html message.')
+            'User, this is an html message.', 'html')
 
     def test_multipart(self):
         message = self._send_mail(
@@ -130,7 +134,8 @@ class SendMailTestCase(BaseMailTestCase):
     def test_overridden2(self):
         self._send_mail(
             'mail_templated_test/overridden2.tpl', {'name': 'User'},
-            'from@inter.net', ['to@inter.net'], 'Overridden hello User',
+            'from@inter.net', ['to@inter.net'],
+            'Overridden hello User. Appendix',
             'User, this is overridden message.\nReally.')
 
     def test_whitespaces(self):
@@ -171,13 +176,14 @@ class SendMailTestCase(BaseMailTestCase):
 class EmailMessageTestCase(BaseMailTestCase):
 
     def _send_mail(self, template_name, context, from_email, to,
-                   res_subject, res_body, *args, **kwargs):
+                   res_subject, res_body, res_content_type='plain',
+                   *args, **kwargs):
         clean = kwargs.pop('clean', False)
         message = EmailMessage(template_name, context, from_email, to,
                                *args, **kwargs)
         message.send(clean=clean)
         return self._assertMessage(from_email, to, res_subject, res_body,
-                                   clean=clean)
+                                   res_content_type, clean=clean)
 
     def test_plain(self):
         self._send_mail(
@@ -199,6 +205,13 @@ class EmailMessageTestCase(BaseMailTestCase):
             'User, this is a plain text message.',
             subject='Static subject', body='Static body')
 
+    def test_html_defaults(self):
+        self._send_mail(
+            'mail_templated_test/plain.html', {'name': 'User'},
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is an html message.', 'html',
+            subject='Static subject', body='Static body')
+
     def test_late_init(self):
         message = EmailMessage()
         message.template_name = 'mail_templated_test/plain.tpl'
@@ -211,6 +224,16 @@ class EmailMessageTestCase(BaseMailTestCase):
             'User, this is a plain text message.')
 
     def test_load_template(self):
+        message = EmailMessage('mail_templated_test/plain.tpl',
+                               {'name': 'User'}, 'from@inter.net',
+                               ['to@inter.net'])
+        message.load_template()
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+
+    def test_load_template_by_name(self):
         message = EmailMessage(None, {'name': 'User'}, 'from@inter.net',
                                ['to@inter.net'])
         message.load_template('mail_templated_test/plain.tpl')
@@ -376,6 +399,13 @@ class RenderTestCase(BaseMailTestCase):
         message = self._initMessage(render=True)
         message.context = CONTEXT2
         message.render()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+        message.send()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+
+    def test_manual_render_with_context(self):
+        message = self._initMessage()
+        message.render(CONTEXT2)
         self._assertIsRendered(message, True, SUBJECT2, BODY2)
         message.send()
         self._assertIsRendered(message, True, SUBJECT2, BODY2)

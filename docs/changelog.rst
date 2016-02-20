@@ -1,5 +1,17 @@
-Django-Mail-Templated Changelog
-===============================
+Changelog
+=========
+
+2.6.x
+-----
+
+- Fixed a bug with default body and html message.
+
+- Added `context` parameter to the `render()` method.
+
+- Made the `template_name` parameter not required for the `load_template()`
+  method.
+
+- Removed *args from the `send_mail()` function.
 
 2.5.x
 -----
