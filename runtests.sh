@@ -63,8 +63,7 @@ function test {
         activate $v $pv true
 
         # Install a fresh version application.
-        find $DIR -name __pycache__ -exec rm -r {} \; || true
-        find $DIR -name "*.pyc" -exec rm {} \;
+        find $DIR \( -name "*.pyc" -o -name __pycache__ \) -delete
         pip install -U --force-reinstall "$DIR/dist/django-mail-templated-test.tar.gz"
 
         # Create test Django project.
