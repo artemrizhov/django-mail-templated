@@ -269,7 +269,7 @@ class EmailMessageTestCase(BaseMailTestCase):
         message = EmailMessage(
             'mail_templated_test/plain.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'])
-        self.assertEqual(message.template, None)
+        self.assertIsNone(message.template)
         dumped_message = pickle.dumps(message)
         message = pickle.loads(dumped_message)
         message.send()
@@ -281,7 +281,7 @@ class EmailMessageTestCase(BaseMailTestCase):
         message = EmailMessage(
             'mail_templated_test/plain.tpl', {'name': 'User'},
             'from@inter.net', ['to@inter.net'], render=True)
-        self.assertNotEqual(message.template, None)
+        self.assertIsNotNone(message.template)
         dumped_message = pickle.dumps(message)
         message = pickle.loads(dumped_message)
         message.send()
@@ -362,8 +362,8 @@ class RenderTestCase(BaseMailTestCase):
             self.assertEqual(message.body, body)
             self.assertTrue(message.is_rendered)
         else:
-            self.assertEqual(message.subject, None)
-            self.assertEqual(message.body, None)
+            self.assertIsNone(message.subject)
+            self.assertIsNone(message.body)
             self.assertFalse(message.is_rendered)
 
     def test_init_render(self):
