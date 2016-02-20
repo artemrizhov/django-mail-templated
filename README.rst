@@ -48,7 +48,7 @@ Features
 Documentation
 -------------
 
-http://django-mail-templated.readthedocs
+http://django-mail-templated.readthedocs.org
 
 
 Quick start
