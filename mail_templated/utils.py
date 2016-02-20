@@ -12,7 +12,7 @@ from .message import EmailMessage
 
 def send_mail(template_name, context, from_email, recipient_list,
               fail_silently=False, auth_user=None, auth_password=None,
-              connection=None, *args, **kwargs):
+              connection=None, **kwargs):
     """
     Easy wrapper for sending a single email message to a recipient list using
     django template system.
@@ -90,5 +90,5 @@ def send_mail(template_name, context, from_email, recipient_list,
     clean = kwargs.pop('clean', True)
     return EmailMessage(
         template_name, context, from_email, recipient_list,
-        connection=connection, *args, **kwargs).send(clean=clean)
+        connection=connection, **kwargs).send(clean=clean)
 
