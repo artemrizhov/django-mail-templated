@@ -22,8 +22,6 @@ using the `Django template system
 Just pass ``template_name`` and ``context`` as the first parameters then use as
 normal.
 
-Full documentation is available at http://django-mail-templated.rtfd.org/
-
 Features
 --------
 
@@ -45,6 +43,12 @@ Features
 * Tested with Django 1.4-1.9.
 
 * Compatible with Python 3.
+
+
+Documentation
+-------------
+
+http://django-mail-templated.readthedocs
 
 
 Quick start
@@ -98,5 +102,7 @@ Advanced usage:
 
     message = EmailMessage('email/hello.tpl', {'user': user}, from_email,
                            to=[user.email])
-    message.render()
+    # TODO: Add more useful commands here.
     message.send()
+
+More useful info and examples at http://django-mail-templated.readthedocs.org

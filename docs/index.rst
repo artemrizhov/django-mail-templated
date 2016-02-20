@@ -68,3 +68,16 @@ Table of Contents
    troubleshuting
    changelog
    contributors
+
+
+Useful links
+------------
+
+* `Django template language
+  <http://django.readthedocs.org/en/stable/ref/templates/language.html>`_
+
+* `Built-in template tags and filters
+  <http://django.readthedocs.org/en/stable/ref/templates/builtins.html>`_
+
+* `The basics of Django template system
+  <http://django.readthedocs.org/en/stable/topics/templates.html>`_
