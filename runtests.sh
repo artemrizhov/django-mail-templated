@@ -4,6 +4,7 @@
 
 set -e
 
+# Get the dir where the script is located.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ $1 == '--install' || $2 == '--install' ]] ; then
@@ -73,9 +74,7 @@ function test {
         fi
         mkdir $project_dir
         $env/bin/django-admin.py startproject testproject $project_dir
-        sed -i -- "s/\(INSTALLED_APPS\s*=\s*[\[(]\)/\1'mail_templated',/" $project_dir/testproject/settings.py
-        sed -i -- "s/\('django.db.backends.\)'/\1sqlite3'/" $project_dir/testproject/settings.py
-        sed -i -- "s/\('NAME': '\)'/\1db.sqlite3'/" $project_dir/testproject/settings.py
+        cat $DIR/mail_templated/test_utils/settings_extra.py >> $project_dir/testproject/settings.py
 
         # Run tests via the test project.
         $project_dir/manage.py test mail_templated
