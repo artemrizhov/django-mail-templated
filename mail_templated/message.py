@@ -148,12 +148,19 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         self.template = get_template(template_name or self.template_name)
 
-    def render(self, clean=False):
+    def render(self, context=None, clean=False):
         """
-        Render email with the current context
+        Render email with provided context
 
         Arguments
         ---------
+        context : dict
+            |context| If not specified then the
+            :attr:`~mail_templated.EmailMessage.context` property is
+            used.
+
+        Keyword Arguments
+        -----------------
         clean : bool
             If ``True``, remove any template specific properties from the
             message object. Default is ``False``.
@@ -161,7 +168,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
-        context = Context(self.context)
+        context = Context(context or self.context)
         # Add tag strings to the context dict.
         context.update(self.extra_context)
         result = self.template.render(context)

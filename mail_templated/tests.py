@@ -390,6 +390,13 @@ class RenderTestCase(BaseMailTestCase):
         message.send()
         self._assertIsRendered(message, True, SUBJECT2, BODY2)
 
+    def test_manual_render_with_context(self):
+        message = self._initMessage()
+        message.render(CONTEXT2)
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+        message.send()
+        self._assertIsRendered(message, True, SUBJECT2, BODY2)
+
     def test_manual_cantrender(self):
         message = EmailMessage()
         self.assertRaises(TemplateDoesNotExist, message.render)
