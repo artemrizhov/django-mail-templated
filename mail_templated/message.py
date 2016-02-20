@@ -134,7 +134,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
             cls._extra_context_fingerprint = (tag_var_format, tag_format)
         return cls._extra_context
 
-    def load_template(self, template_name):
+    def load_template(self, template_name=None):
         """
         Load a template by it's name using the current
         :ref:`template loaders <django:template-loaders>`.
@@ -142,9 +142,11 @@ class EmailMessage(mail.EmailMultiAlternatives):
         Arguments
         ---------
         template_name : str
-            |template_name|
+            |template_name| If not specified then the
+            :attr:`~mail_templated.EmailMessage.template_name` property is
+            used.
         """
-        self.template = get_template(template_name)
+        self.template = get_template(template_name or self.template_name)
 
     def render(self, clean=False):
         """

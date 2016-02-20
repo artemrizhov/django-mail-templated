@@ -211,6 +211,16 @@ class EmailMessageTestCase(BaseMailTestCase):
             'User, this is a plain text message.')
 
     def test_load_template(self):
+        message = EmailMessage('mail_templated_test/plain.tpl',
+                               {'name': 'User'}, 'from@inter.net',
+                               ['to@inter.net'])
+        message.load_template()
+        message.send()
+        self._assertMessage(
+            'from@inter.net', ['to@inter.net'], 'Hello User',
+            'User, this is a plain text message.')
+
+    def test_load_template_by_name(self):
         message = EmailMessage(None, {'name': 'User'}, 'from@inter.net',
                                ['to@inter.net'])
         message.load_template('mail_templated_test/plain.tpl')
