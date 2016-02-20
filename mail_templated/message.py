@@ -168,8 +168,13 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # Load template if it is not loaded yet.
         if not self.template:
             self.load_template(self.template_name)
-        context = Context(context or self.context)
-        # Add tag strings to the context dict.
+        # The signature of the `render()` method was changed in Django 1.7.
+        # https://docs.djangoproject.com/en/1.8/ref/templates/upgrading/#get-template-and-select-template
+        if hasattr(self.template, 'template'):
+            context = (context or self.context).copy()
+        else:
+            context = Context(context or self.context)
+        # Add tag strings to the context.
         context.update(self.extra_context)
         result = self.template.render(context)
         # Don't overwrite default value with empty one.
