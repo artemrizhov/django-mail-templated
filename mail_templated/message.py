@@ -172,19 +172,27 @@ class EmailMessage(mail.EmailMultiAlternatives):
         # Add tag strings to the context dict.
         context.update(self.extra_context)
         result = self.template.render(context)
-        # Don't overwrite default static value with empty one.
-        self.subject = self._get_block(result, 'subject') or self.subject
-        self.body = self._get_block(result, 'body') or self.body
+        # Don't overwrite default value with empty one.
+        subject = self._get_block(result, 'subject')
+        if subject:
+            self.subject = self._get_block(result, 'subject')
+        body = self._get_block(result, 'body')
+        is_html_body = False
         # The html block is optional, and it also may be set manually.
         html = self._get_block(result, 'html')
         if html:
-            if not self.body:
-                # This is html only message.
-                self.body = html
-                self.content_subtype = 'html'
+            if not body:
+                # This is an html message without plain text part.
+                body = html
+                is_html_body = True
             else:
                 # Add alternative content.
                 self.attach_alternative(html, 'text/html')
+        # Don't overwrite default value with empty one.
+        if body:
+            self.body = body
+            if is_html_body:
+                self.content_subtype = 'html'
         self._is_rendered = True
         if clean:
             self.clean()
