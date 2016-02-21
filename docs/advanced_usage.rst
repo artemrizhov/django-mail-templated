@@ -662,9 +662,8 @@ of cleanup yourself. Fortunately there are many places where you can invoke the
 
 .. code-block:: python
 
-    # Invoke the cleanup right on the initialisation. This also forces the
-    # rendering as if you pass `render=True, clean=True`.
-    message = EmailMessage('email/message.tpl', {}, clean=True)
+    # Invoke the cleanup right on the initialisation.
+    message = EmailMessage('email/message.tpl', {}, render=True, clean=True)
     # Call the method manually after rendering.
     message.render()
     message.clean()

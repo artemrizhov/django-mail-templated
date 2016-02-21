@@ -98,8 +98,8 @@ class EmailMessage(mail.EmailMultiAlternatives):
             |render|
         clean : bool
             If ``True``, remove any template specific properties from the
-            message object. This forces immediate rendering even if ``render``
-            parameter is ``False``. Default is ``False``.
+            message object. This may be useful if you pass ``render=True``.
+            Default is ``False``.
         """
         self.template_name = template_name
         self.context = context
@@ -112,8 +112,10 @@ class EmailMessage(mail.EmailMultiAlternatives):
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
 
-        if render or clean:
-            self.render(clean=clean)
+        if render:
+            self.render()
+        if clean:
+            self.clean()
 
     @property
     def is_rendered(self):
