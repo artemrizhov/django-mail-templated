@@ -324,7 +324,7 @@ class EmailMessageTestCase(BaseMailTestCase):
     def test_cleanup_create(self):
         message = EmailMessage(
             'mail_templated_test/plain.tpl', {'name': 'User'},
-            'from@inter.net', ['to@inter.net'], clean=True)
+            'from@inter.net', ['to@inter.net'], render=True, clean=True)
         self._assertMessageClean(message, True)
 
     def test_cleanup_render(self):
