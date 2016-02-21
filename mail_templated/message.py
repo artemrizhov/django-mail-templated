@@ -74,9 +74,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
         .. |body| replace:: Default message body. Used if ``{% body %}``
             block is empty or does not exist in the specified email template.
 
-        .. |render| replace:: If ``True``, render template and set ``subject``,
-            ``body`` and ``html`` properties immediately. Default is ``False``.
-
         Arguments
         ---------
         template_name : str
@@ -94,28 +91,15 @@ class EmailMessage(mail.EmailMultiAlternatives):
             |subject|
         body : str
             |body|
-        render : bool
-            |render|
-        clean : bool
-            If ``True``, remove any template specific properties from the
-            message object. This may be useful if you pass ``render=True``.
-            Default is ``False``.
         """
         self.template_name = template_name
         self.context = context
         subject = kwargs.pop('subject', None)
         body = kwargs.pop('body', None)
-        render = kwargs.pop('render', False)
-        clean = kwargs.pop('clean', False)
         self.template = None
         self._is_rendered = False
 
         super(EmailMessage, self).__init__(subject, body, *args, **kwargs)
-
-        if render:
-            self.render()
-        if clean:
-            self.clean()
 
     @property
     def is_rendered(self):
@@ -150,7 +134,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         """
         self.template = get_template(template_name or self.template_name)
 
-    def render(self, context=None, clean=False):
+    def render(self, context=None):
         """
         Render email with provided context
 
@@ -158,14 +142,7 @@ class EmailMessage(mail.EmailMultiAlternatives):
         ---------
         context : dict
             |context| If not specified then the
-            :attr:`~mail_templated.EmailMessage.context` property is
-            used.
-
-        Keyword Arguments
-        -----------------
-        clean : bool
-            If ``True``, remove any template specific properties from the
-            message object. Default is ``False``.
+            :attr:`~mail_templated.EmailMessage.context` property is used.
         """
         # Load template if it is not loaded yet.
         if not self.template:
@@ -201,8 +178,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
             if is_html_body:
                 self.content_subtype = 'html'
         self._is_rendered = True
-        if clean:
-            self.clean()
 
     def send(self, *args, **kwargs):
         """
@@ -216,8 +191,9 @@ class EmailMessage(mail.EmailMultiAlternatives):
         Keyword Arguments
         -----------------
         clean : bool
-            If ``True``, remove any template specific properties from the
-            message object. Default is ``False``.
+            If ``True``, removes any template specific properties from the
+            message object after rendering. This may be needed for
+            compatibility with third-party apps and libs. Default is ``False``.
         """
         clean = kwargs.pop('clean', False)
         if not self._is_rendered:
@@ -234,12 +210,6 @@ class EmailMessage(mail.EmailMultiAlternatives):
         template-specific properties. Also allows to avoid conflicts with
         Djrill/Mandrill and other third-party systems that may fail because
         of non-standard properties of the message object.
-
-        The messages should be rendered already, or you will have to setup the
-        ``context`` and ``template``/``template_name`` after deserialization.
-
-        In most cases you can pass the ``clean`` parameter to the constructor
-        or another appropriate method of this class.
         """
         del self.context
         del self.template
