@@ -80,7 +80,7 @@ Default subject and body
 
 Both the :func:`mail_templated.send_mail()` function and the
 :class:`mail_templated.EmailMessage` class got new parameters ``template_name``
-and ``context`` instead of (good) old ``subject`` and ``body``. Hover you can
+and ``context`` instead of (good) old ``subject`` and ``body``. However you can
 still pass both old parameters as keyword arguments. In this case they will be
 treated as default values. If there is no appropriate part in the message
 template (:ref:`or it is empty <plain_and_html>`) then the default value will
