@@ -34,13 +34,17 @@ function activate {
         env="$cdir/envs/$pv-$v"
     fi
     if [ ! -d $env ] ; then
-        virtualenv --no-site-packages -p /usr/bin/python$pv $env
+        virtualenv --no-site-packages -p python$pv $env
     fi
 
     source $env/bin/activate
     # Install or upgrade the required Django version.
     if $upgrade ; then
-        pip install -U --download-cache=$cdir/envs/cache "django>=$v1.$v2,<$v1.$(($v2+1))"
+        packages="django>=$v1.$v2,<$v1.$(($v2+1))"
+        if [[ $pv == "2" ]] ; then
+            packages="$packages pysqlite"
+        fi
+        pip install -U --cache-dir=$cdir/envs/cache $packages
     fi
 }
 
@@ -98,11 +102,19 @@ if $install ; then
 fi
 
 cd $DIR/..
-for v in "1.4" "1.5" "1.6" "1.7" "1.8" "1.9" ; do
-    test $v 2
-    if [[ ! ( $v =~ ^(1.4)$ ) ]] ; then
-        test $v 3
-    fi
-done
+
+test "1.4" "2"
+test "1.5" "2"
+test "1.5" "3.4"
+test "1.6" "2"
+test "1.6" "3.4"
+test "1.7" "2"
+test "1.7" "3.4"
+test "1.8" "2"
+test "1.8" "3.4"
+test "1.9" "2"
+test "1.9" "3"
+test "1.10" "2"
+test "1.10" "3"
 
 cd $current_dir
