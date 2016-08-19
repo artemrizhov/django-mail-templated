@@ -34,13 +34,17 @@ function activate {
         env="$cdir/envs/$pv-$v"
     fi
     if [ ! -d $env ] ; then
-        virtualenv --no-site-packages -p /usr/bin/python$pv $env
+        virtualenv --no-site-packages -p python$pv $env
     fi
 
     source $env/bin/activate
     # Install or upgrade the required Django version.
     if $upgrade ; then
-        pip install -U --download-cache=$cdir/envs/cache "django>=$v1.$v2,<$v1.$(($v2+1))"
+        packages="django>=$v1.$v2,<$v1.$(($v2+1))"
+        if [[ $pv == "2" ]] ; then
+            packages="$packages pysqlite"
+        fi
+        pip install -U --cache-dir=$cdir/envs/cache $packages
     fi
 }
 
@@ -49,8 +53,9 @@ function test {
     v=$1
     pv=$2
     cdir=`pwd`
-    echo "===================================================================="
+    echo ""
     echo "Testing with Django $v and Python $pv"
+    echo "===================================================================="
 
     activate $v $pv false
 
@@ -98,11 +103,49 @@ if $install ; then
 fi
 
 cd $DIR/..
-for v in "1.4" "1.5" "1.6" "1.7" "1.8" "1.9" ; do
-    test $v 2
-    if [[ ! ( $v =~ ^(1.4)$ ) ]] ; then
-        test $v 3
-    fi
-done
+
+p2v=`pyenv versions --bare | grep -P '^2.\d+.\d+$' | tail -n 1`
+p34v=`pyenv versions --bare | grep -P '^3.4.\d+$' | tail -n 1`
+p3v=`pyenv versions --bare | grep -P '^3.\d+.\d+$' | tail -n 1`
+export PYENV_VERSION="$p2v:$p3v:$p34v"
+
+echo ""
+echo "Python versions to be used: $p2v, $p34v, $p3v"
+echo "===================================================================="
+p2v=`echo $p2v | sed -r 's/\.[^.]+$//'`
+p34v=`echo $p34v | sed -r 's/\.[^.]+$//'`
+p3v=`echo $p3v | sed -r 's/\.[^.]+$//'`
+
+
+function run_thread_0 {
+    test "1.4" $p2v
+    test "1.5" $p2v
+    test "1.5" $p34v
+}
+function run_thread_1 {
+    test "1.6" $p2v
+    test "1.6" $p34v
+    test "1.7" $p2v
+    test "1.7" $p34v
+}
+function run_thread_2 {
+    test "1.8" $p2v
+    test "1.8" $p34v
+    test "1.9" $p2v
+    test "1.9" $p3v
+}
+function run_thread_3 {
+    test "1.10" $p2v
+    test "1.10" $p3v
+}
+
+if [ $CIRCLE_NODE_INDEX ] ; then
+    run_thread_$CIRCLE_NODE_INDEX
+else
+    run_thread_0
+    run_thread_1
+    run_thread_2
+    run_thread_3
+fi
 
 cd $current_dir

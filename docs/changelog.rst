@@ -13,6 +13,8 @@ Changelog
 
 - Removed *args from the `send_mail()` function.
 
+- Disabled HTML escape in the text parts.
+
 2.5.x
 -----
 
