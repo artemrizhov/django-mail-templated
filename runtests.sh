@@ -116,18 +116,36 @@ p2v=`echo $p2v | sed -r 's/\.[^.]+$//'`
 p34v=`echo $p34v | sed -r 's/\.[^.]+$//'`
 p3v=`echo $p3v | sed -r 's/\.[^.]+$//'`
 
-test "1.4" $p2v
-test "1.5" $p2v
-test "1.5" $p34v
-test "1.6" $p2v
-test "1.6" $p34v
-test "1.7" $p2v
-test "1.7" $p34v
-test "1.8" $p2v
-test "1.8" $p34v
-test "1.9" $p2v
-test "1.9" $p3v
-test "1.10" $p2v
-test "1.10" $p3v
+
+function run_thread_0 {
+    test "1.4" $p2v
+    test "1.5" $p2v
+    test "1.5" $p34v
+}
+function run_thread_1 {
+    test "1.6" $p2v
+    test "1.6" $p34v
+    test "1.7" $p2v
+    test "1.7" $p34v
+}
+function run_thread_2 {
+    test "1.8" $p2v
+    test "1.8" $p34v
+    test "1.9" $p2v
+    test "1.9" $p3v
+}
+function run_thread_3 {
+    test "1.10" $p2v
+    test "1.10" $p3v
+}
+
+if [ $CIRCLE_NODE_INDEX ] ; then
+    run_thread_$CIRCLE_NODE_INDEX
+else
+    run_thread_0
+    run_thread_1
+    run_thread_2
+    run_thread_3
+fi
 
 cd $current_dir
