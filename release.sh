@@ -3,9 +3,13 @@
 set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CDIR=`pwd`
 
-$DIR/runtests.sh --install --upgrade
+cd $DIR
 
-find $DIR \( -name "*.pyc" -o -name __pycache__ \) -delete
+./runtests.sh --install --upgrade
 
-python $DIR/setup.py sdist upload
+find . \( -name "*.pyc" -o -name __pycache__ \) -delete
+python ./setup.py sdist upload
+
+cd $CDIR
