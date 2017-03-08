@@ -40,9 +40,9 @@ Features
 
 * Fully covered with tests.
 
-* Tested with Django 1.4-1.9.
+* Tested with Django 1.4-1.10.
 
-* Compatible with Python 3.
+* Compatible with Python 2 and Python 3.
 
 
 Documentation
