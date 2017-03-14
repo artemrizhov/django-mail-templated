@@ -69,8 +69,10 @@ def send_mail(template_name, context, from_email, recipient_list,
         |subject|
     body : str
         |body|
-    render : bool
-        |render|
+    clean : bool
+        If ``True``, removes any template specific properties from the
+        message object after rendering. This may be needed for compatibility
+        with third-party apps and libs. Default is ``True``.
 
     Returns
     -------
