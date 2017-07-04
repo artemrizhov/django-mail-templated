@@ -425,3 +425,7 @@ class RenderTestCase(BaseMailTestCase):
         message.context = CONTEXT2
         message.send()
         self._assertIsRendered(message, True)
+
+    def test_get_message(self):
+        message = self._initMessage()
+        message.message()
