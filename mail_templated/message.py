@@ -204,6 +204,23 @@ class EmailMessage(mail.EmailMultiAlternatives):
         if clean:
             self.clean()
 
+
+    def message(self):
+        """
+        Constructs a django.core.mail.SafeMIMEText object
+
+        Note
+        ----
+        This method is defined in the core Django library.
+        It uses all the attributes of the email so we render the message if it hasn't been rendered.
+        """
+        if not self._is_rendered:
+            self.render()
+        if clean:
+            self.clean()
+        return super(EmailMessage, self).message()
+
+
     def send(self, *args, **kwargs):
         """
         Send email message, render if it is not rendered yet.
